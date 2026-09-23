@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../repository/auth_repository.dart';
+
 import '../viewmodel/auth_viewmodel.dart';
 
 class LoginScreen extends StatefulWidget {
