@@ -18,6 +18,8 @@ class StaffViewModel extends ChangeNotifier {
   bool _isCreating = false;
   String? _createError;
 
+  bool _isUpdating = false;
+
   StaffViewModel(this._repository);
 
   // ── Getters ─────────────────────────────────────────────────────────────────
@@ -34,6 +36,7 @@ class StaffViewModel extends ChangeNotifier {
 
   bool get isCreating => _isCreating;
   String? get createError => _createError;
+  bool get isUpdating => _isUpdating;
 
   /// True when not loading and the visible list is empty.
   bool get isEmpty => !_isLoading && _filteredStaff.isEmpty;
@@ -111,6 +114,38 @@ class StaffViewModel extends ChangeNotifier {
   void clearCreateError() {
     _createError = null;
     notifyListeners();
+  }
+
+  /// Updates staff status ('active' | 'inactive') and reloads the staff list.
+  Future<bool> updateStaffStatus({
+    required String uid,
+    required String status,
+  }) async {
+    _isUpdating = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final success = await _repository.updateStaffStatus(
+        uid: uid,
+        status: status,
+      );
+
+      if (success) {
+        // Reload list so the change reflects
+        await loadStaff();
+      } else {
+        _errorMessage = 'Failed to update staff status.';
+      }
+
+      return success;
+    } catch (e) {
+      _errorMessage = 'Something went wrong. Please try again.';
+      return false;
+    } finally {
+      _isUpdating = false;
+      notifyListeners();
+    }
   }
 
   // ── Private helpers ──────────────────────────────────────────────────────────

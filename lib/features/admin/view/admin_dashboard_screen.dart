@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../announcements/repository/announcement_repository.dart';
 import '../../announcements/viewmodel/announcement_viewmodel.dart';
+import '../../member/repository/member_repository.dart';
+import '../../member/viewModel/view_model.dart';
 import '../../staff/repository/staff_repository.dart';
 import '../../staff/viewmodel/staff_viewmodel.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../repository/dashboard_stats_repository.dart';
+import '../viewmodel/dashboard_stats_viewmodel.dart';
 import 'tabs/admin_home_tab.dart';
 import 'tabs/admin_members_tab.dart';
 import 'tabs/admin_profile_tab.dart';
@@ -44,6 +48,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         ),
         ChangeNotifierProvider(
           create: (_) => StaffViewModel(StaffRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MemberViewModel(MemberRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DashboardStatsViewModel(DashboardStatsRepository()),
         ),
       ],
       child: Scaffold(

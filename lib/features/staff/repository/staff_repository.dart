@@ -110,4 +110,20 @@ class StaffRepository {
       return null;
     }
   }
+
+  /// Updates the status of a staff member ('active' | 'inactive') in Firestore.
+  Future<bool> updateStaffStatus({
+    required String uid,
+    required String status,
+  }) async {
+    try {
+      await _firestore.collection(_collection).doc(uid).update({
+        'status': status,
+      });
+      return true;
+    } catch (e) {
+      debugPrint('Error updating staff status: $e');
+      return false;
+    }
+  }
 }

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../widgets/admin_stat_card.dart';
+import '../../viewmodel/dashboard_stats_viewmodel.dart';
 import '../widgets/admin_announcement_card.dart';
-import '../../../announcements/viewmodel/announcement_viewmodel.dart';
+import '../widgets/admin_stat_card.dart';
 import '../../../announcements/view/manage_announcement_screen.dart';
+import '../../../announcements/viewmodel/announcement_viewmodel.dart';
 import '../../../authentication/viewmodel/auth_viewmodel.dart';
 
 class AdminHomeTab extends StatefulWidget {
@@ -22,6 +23,7 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = context.read<AnnouncementViewModel>();
       viewModel.loadAnnouncement();
+      context.read<DashboardStatsViewModel>().loadStats();
     });
   }
 
@@ -83,6 +85,8 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<AnnouncementViewModel>();
+    final statsVm = context.watch<DashboardStatsViewModel>();
+    final stats = statsVm.stats;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -116,20 +120,20 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
               const SizedBox(height: 28),
 
               // ── Row 1: two stat cards ──
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: AdminStatCard(
                       icon: Icons.people_outline,
-                      number: '124',
+                      number: stats.totalMembers.toString(),
                       label: 'Members',
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: AdminStatCard(
                       icon: Icons.check_circle_outline,
-                      number: '98',
+                      number: stats.activeMembers.toString(),
                       label: 'Active',
                     ),
                   ),
@@ -139,20 +143,20 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
               const SizedBox(height: 12),
 
               // ── Row 2: two stat cards ──
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: AdminStatCard(
                       icon: Icons.badge_outlined,
-                      number: '12',
+                      number: stats.totalStaff.toString(),
                       label: 'Staff',
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: AdminStatCard(
                       icon: Icons.person_add_alt_1_outlined,
-                      number: '06',
+                      number: stats.newMembersThisMonth.toString().padLeft(2, '0'),
                       label: 'New This Month',
                     ),
                   ),

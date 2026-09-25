@@ -327,8 +327,145 @@ class _StaffListItem extends StatelessWidget {
               ],
             ),
           ),
+
+          // ── Deactivate / Activate action menu ──
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+            onSelected: (value) {
+              if (value == 'deactivate') {
+                _confirmStatusChange(context, staff, 'inactive');
+              } else if (value == 'activate') {
+                _confirmStatusChange(context, staff, 'active');
+              }
+            },
+            itemBuilder: (context) => [
+              if (staff.isActive)
+                const PopupMenuItem(
+                  value: 'deactivate',
+                  child: Row(
+                    children: [
+                      Icon(Icons.block, size: 18, color: AppColors.error),
+                      SizedBox(width: 10),
+                      Text(
+                        'Deactivate',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (!staff.isActive)
+                const PopupMenuItem(
+                  value: 'activate',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Activate',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          color: AppColors.dark,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ],
       ),
     );
+  }
+
+  /// Displays confirmation dialog and updates staff status in Firestore.
+  Future<void> _confirmStatusChange(
+    BuildContext context,
+    StaffModel staff,
+    String newStatus,
+  ) async {
+    final isDeactivating = newStatus == 'inactive';
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          isDeactivating ? 'Deactivate staff?' : 'Activate staff?',
+          style: const TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          isDeactivating
+              ? '${staff.name} will no longer be able to log in.'
+              : '${staff.name} will be able to log in again.',
+          style: const TextStyle(fontFamily: 'Poppins', fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(fontFamily: 'Poppins'),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(
+              foregroundColor: isDeactivating
+                  ? AppColors.error
+                  : AppColors.primary,
+            ),
+            child: Text(
+              isDeactivating ? 'Deactivate' : 'Activate',
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+
+    final vm = context.read<StaffViewModel>();
+    final success = await vm.updateStaffStatus(
+      uid: staff.uid,
+      status: newStatus,
+    );
+
+    if (!context.mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isDeactivating
+                ? '${staff.name} has been deactivated.'
+                : '${staff.name} has been activated.',
+          ),
+          backgroundColor: AppColors.dark,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(vm.errorMessage ?? 'Failed to update.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 }
