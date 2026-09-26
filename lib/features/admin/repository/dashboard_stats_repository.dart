@@ -23,8 +23,10 @@ class DashboardStatsRepository {
         (m) => m['status'] == 'active',
       ).length;
 
-      // Total staff count
-      final totalStaff = staffSnap.docs.length;
+      // Total active staff count
+      final totalStaff = staffSnap.docs
+          .where((d) => d.data()['status'] == 'active')
+          .length;
 
       // New members added in current calendar month
       final now = DateTime.now();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../admin/view/admin_dashboard_screen.dart';
+import '../../receptionist/view/receptionist_dashboard_screen.dart';
 import '../repository/auth_repository.dart';
 import '../repository/profile_repository.dart';
 import '../viewmodel/auth_viewmodel.dart';
@@ -62,7 +63,7 @@ class _AuthGateContent extends StatelessWidget {
         panel = const AdminDashboardScreen();
         break;
       case 'receptionist':
-        panel = const Center(child: Text('Receptionist Panel'));
+        panel = const ReceptionistDashboardScreen();
         break;
       case 'trainer':
         panel = const Center(child: Text('Trainer Panel'));

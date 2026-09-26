@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../authentication/viewmodel/auth_viewmodel.dart';
 import '../../../staff/model/staff_model.dart';
 import '../../../staff/view/create_staff_screen.dart';
 import '../../../staff/viewmodel/staff_viewmodel.dart';
@@ -237,6 +238,9 @@ class _StaffListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get current logged-in admin UID to prevent self-deactivation
+    final currentAdminUid = context.read<AuthViewModel>().userProfile?.uid;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -329,58 +333,61 @@ class _StaffListItem extends StatelessWidget {
           ),
 
           // ── Deactivate / Activate action menu ──
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
-            onSelected: (value) {
-              if (value == 'deactivate') {
-                _confirmStatusChange(context, staff, 'inactive');
-              } else if (value == 'activate') {
-                _confirmStatusChange(context, staff, 'active');
-              }
-            },
-            itemBuilder: (context) => [
-              if (staff.isActive)
-                const PopupMenuItem(
-                  value: 'deactivate',
-                  child: Row(
-                    children: [
-                      Icon(Icons.block, size: 18, color: AppColors.error),
-                      SizedBox(width: 10),
-                      Text(
-                        'Deactivate',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          color: AppColors.error,
+          if (staff.uid != currentAdminUid)
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+              onSelected: (value) {
+                if (value == 'deactivate') {
+                  _confirmStatusChange(context, staff, 'inactive');
+                } else if (value == 'activate') {
+                  _confirmStatusChange(context, staff, 'active');
+                }
+              },
+              itemBuilder: (context) => [
+                if (staff.isActive)
+                  const PopupMenuItem(
+                    value: 'deactivate',
+                    child: Row(
+                      children: [
+                        Icon(Icons.block, size: 18, color: AppColors.error),
+                        SizedBox(width: 10),
+                        Text(
+                          'Deactivate',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            color: AppColors.error,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              if (!staff.isActive)
-                const PopupMenuItem(
-                  value: 'activate',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle_outline,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        'Activate',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          color: AppColors.dark,
+                if (!staff.isActive)
+                  const PopupMenuItem(
+                    value: 'activate',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 18,
+                          color: AppColors.primary,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 10),
+                        Text(
+                          'Activate',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            color: AppColors.dark,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            )
+          else
+            const SizedBox(width: 24), // Keep layout spacing consistent
         ],
       ),
     );
@@ -406,7 +413,7 @@ class _StaffListItem extends StatelessWidget {
         ),
         content: Text(
           isDeactivating
-              ? '${staff.name} will no longer be able to log in.'
+              ? '${staff.name} will no longer be able to log in. You can reactivate them later.'
               : '${staff.name} will be able to log in again.',
           style: const TextStyle(fontFamily: 'Poppins', fontSize: 14),
         ),
