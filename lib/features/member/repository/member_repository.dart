@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:gym_management/features/member/model/member_model.dart';
+
+import '../../staff/helpers/secondary_auth_helper.dart';
+import '../model/member_model.dart';
 
 class MemberRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static const String _collection = 'members';
+
+  // ── Read methods ────────────────────────────────────────────────────────
 
   /// Fetches all member documents from Firestore and returns them as a list
   /// of [MemberModel], sorted alphabetically by name (case-insensitive, A–Z).
@@ -43,6 +47,176 @@ class MemberRepository {
     } catch (e) {
       debugPrint('Error getting member by id ($uid): $e');
       return null;
+    }
+  }
+
+  // ── ID & Email generators ───────────────────────────────────────────────
+
+  /// Generates the next member ID in the format MEM001, MEM002, ...
+  /// Based on the current member count.
+  Future<String> getNextMemberId() async {
+    try {
+      final snapshot = await _firestore.collection(_collection).get();
+      final count = snapshot.docs.length;
+      final nextNumber = count + 1;
+      return 'MEM${nextNumber.toString().padLeft(3, '0')}';
+    } catch (e) {
+      debugPrint('Error generating member ID: $e');
+      // Fallback: use timestamp-based ID
+      final now = DateTime.now().millisecondsSinceEpoch;
+      return 'MEM${now.toString().substring(now.toString().length - 3)}';
+    }
+  }
+
+  /// Generates the next available email in the format:
+  ///   bilawal@gym.com  →  bilawal2@gym.com  →  bilawal3@gym.com
+  /// Checks Firestore to see if the email is already used by another member.
+  Future<String> getNextEmail(String name) async {
+    // Sanitize the name: lowercase, remove spaces & non-alphanumeric
+    final base = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '').trim();
+
+    // If name is empty after sanitization, use a default
+    final baseName = base.isEmpty ? 'member' : base;
+
+    try {
+      // Fetch all existing member emails
+      final snapshot = await _firestore.collection(_collection).get();
+      final existingEmails = snapshot.docs
+          .map((doc) => (doc.data()['email'] as String? ?? '').toLowerCase())
+          .toSet();
+
+      // Try baseName first
+      final firstTry = '$baseName@gym.com';
+      if (!existingEmails.contains(firstTry)) {
+        return firstTry;
+      }
+
+      // Try baseName2, baseName3, ... up to 999
+      for (int i = 2; i < 1000; i++) {
+        final candidate = '$baseName$i@gym.com';
+        if (!existingEmails.contains(candidate)) {
+          return candidate;
+        }
+      }
+
+      // Fallback (should never reach): timestamp-based
+      final now = DateTime.now().millisecondsSinceEpoch;
+      return '$baseName$now@gym.com';
+    } catch (e) {
+      debugPrint('Error generating email: $e');
+      // Fallback
+      final now = DateTime.now().millisecondsSinceEpoch;
+      return '$baseName$now@gym.com';
+    }
+  }
+
+  // ── Create member ──────────────────────────────────────────────────────
+
+  /// Creates a new member:
+  ///   1. Firebase Auth account (via secondary app so receptionist stays
+  ///      logged in)
+  ///   2. Firestore member document
+  /// Returns the created [MemberModel] on success, null on failure.
+  Future<MemberModel?> createMember({
+    required String name,
+    required String phone,
+    required String email,
+    required String password,
+    required String address,
+    required String gender,
+    required String plan,
+    required int duration,
+  }) async {
+    try {
+      // Step 1: Generate member ID
+      final memberId = await getNextMemberId();
+
+      // Step 2: Create Firebase Auth account via secondary app
+      final newUid = await SecondaryAuthHelper.createStaffAuthAccount(
+        email: email,
+        password: password,
+      );
+
+      if (newUid == null) {
+        debugPrint('Auth account creation failed for $email');
+        return null;
+      }
+
+      // Step 3: Calculate dates
+      final now = DateTime.now();
+      final expiryDate = DateTime(now.year, now.month + duration, now.day);
+
+      // Step 4: Build MemberModel
+      final member = MemberModel(
+        uid: newUid,
+        memberId: memberId,
+        name: name,
+        phone: phone,
+        email: email,
+        address: address,
+        gender: gender,
+        status: 'active',
+        plan: plan,
+        duration: duration,
+        startDate: now,
+        expiryDate: expiryDate,
+        createdAt: now,
+      );
+
+      // Step 5: Write to Firestore
+      await _firestore
+          .collection(_collection)
+          .doc(newUid)
+          .set(member.toFirestore());
+
+      return member;
+    } catch (e) {
+      debugPrint('Error creating member: $e');
+      return null;
+    }
+  }
+
+  // ── Update methods ────────────────────────────────────────────────────
+
+  /// Updates only the status field of a member doc.
+  /// Returns true on success.
+  Future<bool> updateMemberStatus({
+    required String uid,
+    required String status, // 'active' | 'inactive' | 'expired'
+  }) async {
+    try {
+      await _firestore.collection(_collection).doc(uid).update({
+        'status': status,
+      });
+      return true;
+    } catch (e) {
+      debugPrint('Error updating member status: $e');
+      return false;
+    }
+  }
+
+  /// Renews a membership by updating plan, duration, and dates.
+  /// Also sets status back to 'active'.
+  Future<bool> renewMembership({
+    required String uid,
+    required String plan,
+    required int duration,
+  }) async {
+    try {
+      final now = DateTime.now();
+      final expiryDate = DateTime(now.year, now.month + duration, now.day);
+
+      await _firestore.collection(_collection).doc(uid).update({
+        'status': 'active',
+        'plan': plan,
+        'duration': duration,
+        'startDate': Timestamp.fromDate(now),
+        'expiryDate': Timestamp.fromDate(expiryDate),
+      });
+      return true;
+    } catch (e) {
+      debugPrint('Error renewing membership: $e');
+      return false;
     }
   }
 }

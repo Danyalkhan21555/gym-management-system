@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../admin/view/admin_dashboard_screen.dart';
 import '../../receptionist/view/receptionist_dashboard_screen.dart';
-import '../repository/auth_repository.dart';
-import '../repository/profile_repository.dart';
-import '../viewmodel/auth_viewmodel.dart';
+import '../viewModel/auth_viewmodel.dart';
 import 'login_screen.dart';
 
 class AuthGate extends StatelessWidget {
@@ -13,12 +11,7 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) =>
-          AuthViewModel(AuthRepository(), ProfileRepository())
-            ..checkCurrentUser(),
-      child: const _AuthGateContent(),
-    );
+    return const _AuthGateContent();
   }
 }
 

@@ -1,9 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'core/theme/app_theme.dart';
-import 'firebase_options.dart';
+import 'features/authentication/repository/auth_repository.dart';
+import 'features/authentication/repository/profile_repository.dart';
+import 'features/authentication/viewModel/auth_viewmodel.dart';
 import 'features/authentication/view/auth_gate.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,11 +22,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Gym Management System',
-      theme: AppTheme.lightTheme,
-      home: const AuthGate(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AuthViewModel(
+            AuthRepository(),
+            ProfileRepository(),
+          )..checkCurrentUser(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Gym Management System',
+        theme: AppTheme.lightTheme,
+        home: const AuthGate(),
+      ),
     );
   }
 }
