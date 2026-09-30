@@ -9,7 +9,9 @@ class MemberViewModel extends ChangeNotifier {
   List<MemberModel> _allMembers = [];
   List<MemberModel> _filteredMembers = [];
   bool _isLoading = false;
+  bool _isCreating = false;
   String? _errorMessage;
+  String? _createError;
   String _searchQuery = '';
 
   MemberViewModel(this._repository);
@@ -19,13 +21,15 @@ class MemberViewModel extends ChangeNotifier {
   List<MemberModel> get members => _filteredMembers;
   List<MemberModel> get allMembers => _allMembers;
   bool get isLoading => _isLoading;
+  bool get isCreating => _isCreating;
   String? get errorMessage => _errorMessage;
+  String? get createError => _createError;
   String get searchQuery => _searchQuery;
 
   /// True when not loading and the visible list is empty.
   bool get isEmpty => !_isLoading && _filteredMembers.isEmpty;
 
-  // ── Methods ──────────────────────────────────────────────────────────────
+  // ── Read methods ─────────────────────────────────────────────────────────
 
   /// Fetches all members from the repository and applies the current
   /// search query.
@@ -52,9 +56,69 @@ class MemberViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Clears any currently displayed error message.
+  /// Clears any currently displayed error message (list load error).
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  // ── Create member ────────────────────────────────────────────────────────
+
+  /// Creates a new member:
+  ///   - Generates a unique member ID and email
+  ///   - Creates a Firebase Auth account (without logging out the current user)
+  ///   - Writes the member doc to Firestore
+  ///   - Refreshes the member list
+  ///
+  /// Returns the created [MemberModel] on success, null on failure.
+  Future<MemberModel?> createMember({
+    required String name,
+    required String phone,
+    required String password,
+    required String address,
+    required String gender,
+    required String plan,
+    required int duration,
+  }) async {
+    _isCreating = true;
+    _createError = null;
+    notifyListeners();
+
+    try {
+      // Generate email from name (auto-increment if already taken)
+      final email = await _repository.getNextEmail(name);
+
+      final member = await _repository.createMember(
+        name: name,
+        phone: phone,
+        email: email,
+        password: password,
+        address: address,
+        gender: gender,
+        plan: plan,
+        duration: duration,
+      );
+
+      if (member == null) {
+        _createError = 'Failed to create member. Email may already be in use.';
+        return null;
+      }
+
+      // Refresh the list so the new member appears immediately
+      await loadMembers();
+      return member;
+    } catch (e) {
+      _createError = 'Something went wrong. Please try again.';
+      return null;
+    } finally {
+      _isCreating = false;
+      notifyListeners();
+    }
+  }
+
+  /// Clears the create-member error message.
+  void clearCreateError() {
+    _createError = null;
     notifyListeners();
   }
 
