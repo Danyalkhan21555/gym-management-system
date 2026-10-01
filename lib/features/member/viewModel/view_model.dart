@@ -65,7 +65,7 @@ class MemberViewModel extends ChangeNotifier {
   // ── Create member ────────────────────────────────────────────────────────
 
   /// Creates a new member:
-  ///   - Generates a unique member ID and email
+  ///   - Uses the receptionist-supplied [email] directly (no auto-generation)
   ///   - Creates a Firebase Auth account (without logging out the current user)
   ///   - Writes the member doc to Firestore
   ///   - Refreshes the member list
@@ -74,6 +74,7 @@ class MemberViewModel extends ChangeNotifier {
   Future<MemberModel?> createMember({
     required String name,
     required String phone,
+    required String email, // email entered manually by the receptionist
     required String password,
     required String address,
     required String gender,
@@ -85,9 +86,7 @@ class MemberViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Generate email from name (auto-increment if already taken)
-      final email = await _repository.getNextEmail(name);
-
+      // Pass the receptionist-supplied email directly to the repository
       final member = await _repository.createMember(
         name: name,
         phone: phone,
@@ -100,7 +99,8 @@ class MemberViewModel extends ChangeNotifier {
       );
 
       if (member == null) {
-        _createError = 'Failed to create member. Email may already be in use.';
+        _createError =
+            'Failed to create member. Email may already be in use, or invalid data.';
         return null;
       }
 

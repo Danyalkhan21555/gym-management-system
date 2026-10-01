@@ -68,48 +68,6 @@ class MemberRepository {
     }
   }
 
-  /// Generates the next available email in the format:
-  ///   bilawal@gym.com  →  bilawal2@gym.com  →  bilawal3@gym.com
-  /// Checks Firestore to see if the email is already used by another member.
-  Future<String> getNextEmail(String name) async {
-    // Sanitize the name: lowercase, remove spaces & non-alphanumeric
-    final base = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '').trim();
-
-    // If name is empty after sanitization, use a default
-    final baseName = base.isEmpty ? 'member' : base;
-
-    try {
-      // Fetch all existing member emails
-      final snapshot = await _firestore.collection(_collection).get();
-      final existingEmails = snapshot.docs
-          .map((doc) => (doc.data()['email'] as String? ?? '').toLowerCase())
-          .toSet();
-
-      // Try baseName first
-      final firstTry = '$baseName@gym.com';
-      if (!existingEmails.contains(firstTry)) {
-        return firstTry;
-      }
-
-      // Try baseName2, baseName3, ... up to 999
-      for (int i = 2; i < 1000; i++) {
-        final candidate = '$baseName$i@gym.com';
-        if (!existingEmails.contains(candidate)) {
-          return candidate;
-        }
-      }
-
-      // Fallback (should never reach): timestamp-based
-      final now = DateTime.now().millisecondsSinceEpoch;
-      return '$baseName$now@gym.com';
-    } catch (e) {
-      debugPrint('Error generating email: $e');
-      // Fallback
-      final now = DateTime.now().millisecondsSinceEpoch;
-      return '$baseName$now@gym.com';
-    }
-  }
-
   // ── Create member ──────────────────────────────────────────────────────
 
   /// Creates a new member:
