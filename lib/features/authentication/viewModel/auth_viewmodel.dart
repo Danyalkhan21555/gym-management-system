@@ -17,6 +17,10 @@ class AuthViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
+  // ── Splash guard: true once checkCurrentUser() has finished ──
+  bool _hasCheckedCurrentUser = false;
+  bool get hasCheckedCurrentUser => _hasCheckedCurrentUser;
+
   AuthViewModel(this._authRepository, this._profileRepository);
 
   Future<void> login(String email, String password) async {
@@ -77,20 +81,27 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Checks whether a Firebase session already exists on app launch.
+  /// Sets [hasCheckedCurrentUser] = true when complete, which dismisses
+  /// the splash screen in AuthGate.
   Future<void> checkCurrentUser() async {
     currentUser = _authRepository.getCurrentUser();
 
     if (currentUser != null) {
-      userProfile = await _profileRepository.getUserProfile(currentUser!.uid);
+      userProfile = await _profileRepository.getUserProfile(
+        currentUser!.uid,
+      );
 
-      // ── Lazy expiry check for members ──
       if (userProfile != null) {
+        // ── Lazy expiry check for members ──
         await _checkMembershipExpiry();
       }
     } else {
       userProfile = null;
     }
 
+    // ── Mark initialisation complete so splash screen is dismissed ──
+    _hasCheckedCurrentUser = true;
     notifyListeners();
   }
 

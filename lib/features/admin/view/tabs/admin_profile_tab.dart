@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../authentication/viewmodel/auth_viewmodel.dart';
 
 class AdminProfileTab extends StatelessWidget {
   const AdminProfileTab({super.key});
@@ -10,7 +9,7 @@ class AdminProfileTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Watch so profile info updates if user data changes
-    final viewModel = context.watch<AuthViewModel>();
+    final viewModel = AuthProvider.of(context);
     final profile = viewModel.userProfile;
 
     // Safe fallbacks if profile is somehow null
@@ -263,7 +262,7 @@ class AdminProfileTab extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-                context.read<AuthViewModel>().logout();
+                AuthProvider.of(context).logout();
               },
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
               child: const Text(

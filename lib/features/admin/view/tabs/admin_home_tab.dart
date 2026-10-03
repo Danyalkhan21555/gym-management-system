@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../viewmodel/dashboard_stats_viewmodel.dart';
 import '../widgets/admin_announcement_card.dart';
 import '../widgets/admin_stat_card.dart';
 import '../../../announcements/view/manage_announcement_screen.dart';
 import '../../../announcements/viewmodel/announcement_viewmodel.dart';
-import '../../../authentication/viewmodel/auth_viewmodel.dart';
 
 class AdminHomeTab extends StatefulWidget {
   const AdminHomeTab({super.key});
@@ -64,7 +64,7 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
   /// when the user returns. This ensures the Home tab reflects any
   /// add / edit / delete performed on that screen.
   Future<void> _openManageScreen() async {
-    final authVm = context.read<AuthViewModel>();
+    final authVm = AuthProvider.of(context);
 
     await Navigator.push(
       context,

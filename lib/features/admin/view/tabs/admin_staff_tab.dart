@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../authentication/viewmodel/auth_viewmodel.dart';
 import '../../../staff/model/staff_model.dart';
 import '../../../staff/view/create_staff_screen.dart';
 import '../../../staff/viewmodel/staff_viewmodel.dart';
@@ -239,7 +239,7 @@ class _StaffListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Get current logged-in admin UID to prevent self-deactivation
-    final currentAdminUid = context.read<AuthViewModel>().userProfile?.uid;
+    final currentAdminUid = AuthProvider.of(context).userProfile?.uid;
 
     return Container(
       padding: const EdgeInsets.all(16),

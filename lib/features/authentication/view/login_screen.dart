@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
+import '../../../core/providers/auth_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-
-import '../viewmodel/auth_viewmodel.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     if (_formKey.currentState?.validate() ?? false) {
-      final viewModel = context.read<AuthViewModel>();
+      final viewModel = AuthProvider.of(context);
       viewModel.login(
         _emailController.text.trim(),
         _passwordController.text.trim(),
@@ -40,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // Watch the ViewModel to rebuild when state (loading, error) changes
-    final viewModel = context.watch<AuthViewModel>();
+    final viewModel = AuthProvider.of(context);
     final isLoading = viewModel.isLoading;
     final errorMessage = viewModel.errorMessage;
 

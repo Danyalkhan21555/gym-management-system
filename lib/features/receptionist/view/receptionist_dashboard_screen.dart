@@ -7,14 +7,12 @@ import '../../admin/viewmodel/dashboard_stats_viewmodel.dart';
 import '../../announcements/repository/announcement_repository.dart';
 import '../../announcements/viewmodel/announcement_viewmodel.dart';
 import '../../member/repository/member_repository.dart';
-// Fix case-sensitivity and file name for MemberViewModel import
 import '../../member/viewModel/view_model.dart';
 import 'tabs/receptionist_create_tab.dart';
 import 'tabs/receptionist_home_tab.dart';
 import 'tabs/receptionist_members_tab.dart';
 import 'tabs/receptionist_profile_tab.dart';
 
-/// Main dashboard shell for Receptionists with custom 4-tab bottom navigation.
 class ReceptionistDashboardScreen extends StatefulWidget {
   const ReceptionistDashboardScreen({super.key});
 
@@ -70,7 +68,12 @@ class _ReceptionistDashboardScreenState
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Row(
                 children: [
-                  _buildNavItem(0, 'Home', Icons.home, Icons.home_outlined),
+                  _buildNavItem(
+                    0,
+                    'Home',
+                    Icons.home,
+                    Icons.home_outlined,
+                  ),
                   _buildNavItem(
                     1,
                     'Members',
@@ -98,7 +101,6 @@ class _ReceptionistDashboardScreenState
     );
   }
 
-  /// Builds a single bottom navigation item with custom active/inactive styling and dot indicator.
   Widget _buildNavItem(
     int index,
     String label,

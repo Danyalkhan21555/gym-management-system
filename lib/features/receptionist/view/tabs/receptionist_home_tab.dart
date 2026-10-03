@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../admin/view/widgets/admin_announcement_card.dart';
 import '../../../admin/view/widgets/admin_stat_card.dart';
 import '../../../admin/viewmodel/dashboard_stats_viewmodel.dart';
 import '../../../announcements/viewmodel/announcement_viewmodel.dart';
-import '../../../authentication/viewModel/auth_viewmodel.dart';
 
 /// Receptionist Home tab displaying greeting, key dashboard stats, quick actions, and announcements.
 class ReceptionistHomeTab extends StatefulWidget {
@@ -66,12 +66,11 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    final authVm = context.watch<AuthViewModel>();
+    final authVm = AuthProvider.of(context);
     final statsVm = context.watch<DashboardStatsViewModel>();
     final announcementVm = context.watch<AnnouncementViewModel>();
     final name = authVm.userProfile?.name ?? 'Receptionist';
     final stats = statsVm.stats;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
