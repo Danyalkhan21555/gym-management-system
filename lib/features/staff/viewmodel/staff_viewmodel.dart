@@ -19,6 +19,7 @@ class StaffViewModel extends ChangeNotifier {
   String? _createError;
 
   bool _isUpdating = false;
+  bool _isDeleting = false;
 
   StaffViewModel(this._repository);
 
@@ -37,6 +38,7 @@ class StaffViewModel extends ChangeNotifier {
   bool get isCreating => _isCreating;
   String? get createError => _createError;
   bool get isUpdating => _isUpdating;
+  bool get isDeleting => _isDeleting;
 
   /// True when not loading and the visible list is empty.
   bool get isEmpty => !_isLoading && _filteredStaff.isEmpty;
@@ -144,6 +146,29 @@ class StaffViewModel extends ChangeNotifier {
       return false;
     } finally {
       _isUpdating = false;
+      notifyListeners();
+    }
+  }
+
+  /// Permanently deletes a staff document and reloads the staff list.
+  Future<bool> deleteStaff(String uid) async {
+    _isDeleting = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final success = await _repository.deleteStaff(uid);
+      if (success) {
+        await loadStaff();
+      } else {
+        _errorMessage = 'Failed to remove staff.';
+      }
+      return success;
+    } catch (e) {
+      _errorMessage = 'Something went wrong. Please try again.';
+      return false;
+    } finally {
+      _isDeleting = false;
       notifyListeners();
     }
   }

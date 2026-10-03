@@ -332,7 +332,7 @@ class _StaffListItem extends StatelessWidget {
             ),
           ),
 
-          // ── Deactivate / Activate action menu ──
+          // ── Deactivate / Activate / Remove action menu ──
           if (staff.uid != currentAdminUid)
             PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
@@ -341,6 +341,8 @@ class _StaffListItem extends StatelessWidget {
                   _confirmStatusChange(context, staff, 'inactive');
                 } else if (value == 'activate') {
                   _confirmStatusChange(context, staff, 'active');
+                } else if (value == 'remove') {
+                  _confirmRemove(context, staff);
                 }
               },
               itemBuilder: (context) => [
@@ -384,6 +386,24 @@ class _StaffListItem extends StatelessWidget {
                       ],
                     ),
                   ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  value: 'remove',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                      SizedBox(width: 10),
+                      Text(
+                        'Remove permanently',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             )
           else
@@ -404,6 +424,9 @@ class _StaffListItem extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
         title: Text(
           isDeactivating ? 'Deactivate staff?' : 'Activate staff?',
           style: const TextStyle(
@@ -422,7 +445,10 @@ class _StaffListItem extends StatelessWidget {
             onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text(
               'Cancel',
-              style: TextStyle(fontFamily: 'Poppins'),
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
           TextButton(
@@ -475,4 +501,90 @@ class _StaffListItem extends StatelessWidget {
       );
     }
   }
+
+  /// Displays confirmation dialog and permanently deletes staff document.
+  Future<void> _confirmRemove(BuildContext context, StaffModel staff) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Text(
+          'Remove staff permanently?',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
+            color: AppColors.dark,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${staff.name} will be permanently removed. This cannot be undone. They will no longer be able to log in.',
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                color: AppColors.dark,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Consider deactivating instead if you might reactivate later.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text(
+              'Remove',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+
+    final vm = context.read<StaffViewModel>();
+    final success = await vm.deleteStaff(staff.uid);
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? '${staff.name} has been removed.'
+              : vm.errorMessage ?? 'Failed to remove.',
+        ),
+        backgroundColor: success ? AppColors.dark : AppColors.error,
+      ),
+    );
+  }
 }
+

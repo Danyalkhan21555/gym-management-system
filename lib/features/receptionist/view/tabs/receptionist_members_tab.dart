@@ -272,13 +272,16 @@ class _MemberListItem extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => MemberDetailScreen(member: member),
               ),
             );
+            if (context.mounted) {
+              context.read<MemberViewModel>().loadMembers();
+            }
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -356,16 +359,155 @@ class _MemberListItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                // Chevron icon visual cue
-                const Icon(
-                  Icons.chevron_right,
-                  size: 20,
-                  color: AppColors.textSecondary,
+                // ── 3-dot action menu ──
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+                  onSelected: (value) {
+                    if (value == 'view') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => MemberDetailScreen(member: member),
+                        ),
+                      ).then((_) {
+                        if (context.mounted) {
+                          context.read<MemberViewModel>().loadMembers();
+                        }
+                      });
+                    } else if (value == 'remove') {
+                      _confirmRemoveMember(context, member);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'view',
+                      child: Row(
+                        children: [
+                          Icon(Icons.visibility_outlined, size: 18, color: AppColors.dark),
+                          SizedBox(width: 10),
+                          Text(
+                            'View details',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              color: AppColors.dark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    const PopupMenuItem(
+                      value: 'remove',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                          SizedBox(width: 10),
+                          Text(
+                            'Remove permanently',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Displays confirmation dialog and permanently deletes member document.
+  Future<void> _confirmRemoveMember(
+    BuildContext context,
+    MemberModel member,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Text(
+          'Remove member permanently?',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
+            color: AppColors.dark,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${member.name} will be permanently removed. This cannot be undone. They will no longer be able to log in.',
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                color: AppColors.dark,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Consider deactivating instead if you might reactivate later.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text(
+              'Remove',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!context.mounted) return;
+
+    final vm = context.read<MemberViewModel>();
+    final success = await vm.deleteMember(member.uid);
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? '${member.name} has been removed.'
+              : vm.errorMessage ?? 'Failed to remove.',
+        ),
+        backgroundColor: success ? AppColors.dark : AppColors.error,
       ),
     );
   }

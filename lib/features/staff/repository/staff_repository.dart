@@ -126,4 +126,16 @@ class StaffRepository {
       return false;
     }
   }
+
+  /// Permanently deletes the staff Firestore document.
+  /// Does NOT delete the Firebase Auth account (client SDK can't).
+  Future<bool> deleteStaff(String uid) async {
+    try {
+      await _firestore.collection(_collection).doc(uid).delete();
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting staff: $e');
+      return false;
+    }
+  }
 }

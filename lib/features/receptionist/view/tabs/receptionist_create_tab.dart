@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../admin/viewmodel/dashboard_stats_viewmodel.dart';
 import '../../../member/model/member_model.dart';
 import '../../../member/viewModel/view_model.dart';
 
@@ -73,6 +74,10 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
     if (!mounted) return;
 
     if (result != null) {
+      // Refresh dashboard stats so Home tab counts update
+      if (mounted) {
+        context.read<DashboardStatsViewModel>().loadStats();
+      }
       _showSuccessDialog(result, password);
       _clearForm();
     }

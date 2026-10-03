@@ -10,6 +10,7 @@ class MemberViewModel extends ChangeNotifier {
   List<MemberModel> _filteredMembers = [];
   bool _isLoading = false;
   bool _isCreating = false;
+  bool _isDeleting = false;
   String? _errorMessage;
   String? _createError;
   String _searchQuery = '';
@@ -22,6 +23,7 @@ class MemberViewModel extends ChangeNotifier {
   List<MemberModel> get allMembers => _allMembers;
   bool get isLoading => _isLoading;
   bool get isCreating => _isCreating;
+  bool get isDeleting => _isDeleting;
   String? get errorMessage => _errorMessage;
   String? get createError => _createError;
   String get searchQuery => _searchQuery;
@@ -120,6 +122,31 @@ class MemberViewModel extends ChangeNotifier {
   void clearCreateError() {
     _createError = null;
     notifyListeners();
+  }
+
+  // ── Delete member ────────────────────────────────────────────────────────
+
+  /// Permanently deletes a member document and reloads the member list.
+  Future<bool> deleteMember(String uid) async {
+    _isDeleting = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final success = await _repository.deleteMember(uid);
+      if (success) {
+        await loadMembers();
+      } else {
+        _errorMessage = 'Failed to remove member.';
+      }
+      return success;
+    } catch (e) {
+      _errorMessage = 'Something went wrong. Please try again.';
+      return false;
+    } finally {
+      _isDeleting = false;
+      notifyListeners();
+    }
   }
 
   // ── Private helpers ──────────────────────────────────────────────────────

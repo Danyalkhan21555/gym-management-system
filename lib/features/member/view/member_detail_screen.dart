@@ -2,16 +2,119 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../model/member_model.dart';
+import '../repository/member_repository.dart';
 
-/// Read-only detail screen for a single member.
-/// Displayed when an admin taps on a member in the members list.
-class MemberDetailScreen extends StatelessWidget {
+/// Detail screen for a single member with membership info and deactivation option.
+class MemberDetailScreen extends StatefulWidget {
   final MemberModel member;
 
   const MemberDetailScreen({super.key, required this.member});
 
   @override
+  State<MemberDetailScreen> createState() => _MemberDetailScreenState();
+}
+
+class _MemberDetailScreenState extends State<MemberDetailScreen> {
+  bool _isRemoving = false;
+
+  /// Handles member deactivation confirmation and status update.
+  Future<void> _handleRemoveMember() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Remove member?',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+              color: AppColors.dark,
+            ),
+          ),
+          content: Text(
+            '${widget.member.name} will no longer be able to log in. You can reactivate them later.',
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text(
+                'Remove',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.error,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => _isRemoving = true);
+
+    try {
+      final repo = MemberRepository();
+      final success = await repo.updateMemberStatus(
+        uid: widget.member.uid,
+        status: 'inactive',
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${widget.member.name} has been deactivated.'),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to deactivate member. Please try again.'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isRemoving = false);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final member = widget.member;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -124,6 +227,49 @@ class MemberDetailScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
+              // ── Membership Details Card ──
+              _buildSectionCard(
+                title: 'Membership Details',
+                icon: Icons.card_membership_outlined,
+                rows: [
+                  _InfoRow(
+                    label: 'Plan',
+                    value: member.planLabel,
+                  ),
+                  _InfoRow(
+                    label: 'Duration',
+                    value: member.durationLabel,
+                  ),
+                  _InfoRow(
+                    label: 'Started',
+                    value: member.startDate != null
+                        ? _formatDate(member.startDate!)
+                        : '—',
+                  ),
+                  _InfoRow(
+                    label: 'Expires',
+                    value: member.expiryDate != null
+                        ? _formatDate(member.expiryDate!)
+                        : '—',
+                  ),
+                  _InfoRow(
+                    label: 'Days Left',
+                    value: member.expiryDate == null
+                        ? '—'
+                        : member.daysRemaining > 0
+                            ? '${member.daysRemaining} ${member.daysRemaining == 1 ? 'day' : 'days'}'
+                            : 'Expired',
+                    valueColor: member.expiryDate == null
+                        ? null
+                        : member.daysRemaining > 0
+                            ? const Color(0xFF2E7D32)
+                            : AppColors.error,
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
               // ── Status Card ──
               _buildSectionCard(
                 title: 'Membership Status',
@@ -136,6 +282,52 @@ class MemberDetailScreen extends StatelessWidget {
                   ),
                 ],
               ),
+
+              // ── Remove / Deactivate Member Button ──
+              if (member.status.toLowerCase() != 'inactive') ...[
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 54,
+                  child: OutlinedButton.icon(
+                    onPressed: _isRemoving ? null : _handleRemoveMember,
+                    icon: _isRemoving
+                        ? const SizedBox.shrink()
+                        : const Icon(
+                            Icons.person_remove_outlined,
+                            size: 20,
+                            color: AppColors.error,
+                          ),
+                    label: _isRemoving
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: AppColors.error,
+                            ),
+                          )
+                        : const Text(
+                            'Remove Member',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.error,
+                            ),
+                          ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      side: BorderSide(
+                        color: AppColors.error.withValues(alpha: 0.5),
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
 
               const SizedBox(height: 24),
             ],
