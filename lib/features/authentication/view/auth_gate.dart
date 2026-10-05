@@ -4,6 +4,7 @@ import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../admin/view/admin_dashboard_screen.dart';
 import '../../receptionist/view/receptionist_dashboard_screen.dart';
+import '../../trainer/view/trainer_dashboard_screen.dart';
 import 'login_screen.dart';
 
 class AuthGate extends StatelessWidget {
@@ -59,7 +60,7 @@ class _AuthGateContent extends StatelessWidget {
         panel = const ReceptionistDashboardScreen();
         break;
       case 'trainer':
-        panel = const Center(child: Text('Trainer Panel'));
+        panel = const TrainerDashboardScreen();
         break;
       case 'member':
         panel = const Center(child: Text('Member Panel'));
