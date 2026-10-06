@@ -14,6 +14,8 @@ import 'tabs/trainer_chat_tab.dart';
 import 'tabs/trainer_diet_tab.dart';
 import 'tabs/trainer_home_tab.dart';
 import 'tabs/trainer_profile_tab.dart';
+import '../../admin/repository/dashboard_stats_repository.dart';
+import '../../admin/viewmodel/dashboard_stats_viewmodel.dart';
 
 /// Trainer dashboard shell with persistent bottom navigation bar.
 class TrainerDashboardScreen extends StatefulWidget {
@@ -36,59 +38,68 @@ class _TrainerDashboardScreenState extends State<TrainerDashboardScreen> {
           create: (_) => DietPlanViewModel(DietPlanRepository()),
           child: ChangeNotifierProvider(
             create: (_) => ChatViewModel(ChatRepository()),
-            child: Scaffold(
-            body: IndexedStack(
-              index: _selectedIndex,
-              children: [
-                TrainerHomeTab(
-                  onWriteDietTap: () => setState(() => _selectedIndex = 1),
+            child: ChangeNotifierProvider(
+              create: (_) =>
+                  DashboardStatsViewModel(DashboardStatsRepository()), // ← NEW
+              child: Scaffold(
+                body: IndexedStack(
+                  index: _selectedIndex,
+                  children: [
+                    TrainerHomeTab(
+                      onWriteDietTap: () => setState(() => _selectedIndex = 1),
+                    ),
+                    const TrainerDietTab(),
+                    const TrainerChatTab(),
+                    const TrainerProfileTab(),
+                  ],
                 ),
-                const TrainerDietTab(),
-                const TrainerChatTab(),
-                const TrainerProfileTab(),
-              ],
-            ),
-            bottomNavigationBar: Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 16,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      _buildNavItem(0, 'Home', Icons.home, Icons.home_outlined),
-                      _buildNavItem(
-                        1,
-                        'Diet Plans',
-                        Icons.restaurant_menu,
-                        Icons.restaurant_menu_outlined,
-                      ),
-                      _buildNavItem(
-                        2,
-                        'Chat',
-                        Icons.chat_bubble,
-                        Icons.chat_bubble_outline,
-                      ),
-                      _buildNavItem(
-                        3,
-                        'Profile',
-                        Icons.person,
-                        Icons.person_outline,
+                bottomNavigationBar: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 16,
+                        offset: const Offset(0, -4),
                       ),
                     ],
                   ),
+                  child: SafeArea(
+                    top: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          _buildNavItem(
+                            0,
+                            'Home',
+                            Icons.home,
+                            Icons.home_outlined,
+                          ),
+                          _buildNavItem(
+                            1,
+                            'Diet Plans',
+                            Icons.restaurant_menu,
+                            Icons.restaurant_menu_outlined,
+                          ),
+                          _buildNavItem(
+                            2,
+                            'Chat',
+                            Icons.chat_bubble,
+                            Icons.chat_bubble_outline,
+                          ),
+                          _buildNavItem(
+                            3,
+                            'Profile',
+                            Icons.person,
+                            Icons.person_outline,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
             ),
           ),
         ),

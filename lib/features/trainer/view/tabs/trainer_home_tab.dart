@@ -5,7 +5,9 @@ import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../admin/view/widgets/admin_announcement_card.dart';
 import '../../../admin/view/widgets/admin_stat_card.dart';
+import '../../../admin/viewmodel/dashboard_stats_viewmodel.dart';
 import '../../../announcements/viewmodel/announcement_viewmodel.dart';
+import '../../../dietPlan/viewmodel/diet_plan_viewmodel.dart';
 
 class TrainerHomeTab extends StatefulWidget {
   /// Called when the trainer taps "Write Diet Plan".
@@ -24,6 +26,14 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AnnouncementViewModel>().loadAnnouncement();
+      context.read<DashboardStatsViewModel>().loadStats();
+
+      // Load trainer's own diet plans count
+      final authVm = AuthProvider.of(context);
+      final trainerId = authVm.userProfile?.uid;
+      if (trainerId != null) {
+        context.read<DietPlanViewModel>().loadPlansByTrainer(trainerId);
+      }
     });
   }
 
@@ -63,8 +73,11 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
   @override
   Widget build(BuildContext context) {
     final authVm = AuthProvider.of(context);
+    final statsVm = context.watch<DashboardStatsViewModel>();
     final announcementVm = context.watch<AnnouncementViewModel>();
+    final dietPlanVm = context.watch<DietPlanViewModel>();
     final name = authVm.userProfile?.name ?? 'Trainer';
+    final stats = statsVm.stats;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -98,20 +111,20 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
               const SizedBox(height: 28),
 
               // ── Stat cards ──
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: AdminStatCard(
                       icon: Icons.people_outline,
-                      number: '—',
-                      label: 'Members',
+                      number: stats.activeMembers.toString(),
+                      label: 'Active Members',
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: AdminStatCard(
                       icon: Icons.restaurant_outlined,
-                      number: '—',
+                      number: dietPlanVm.trainerPlans.length.toString(),
                       label: 'Diet Plans',
                     ),
                   ),
