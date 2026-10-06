@@ -9,9 +9,10 @@ class DashboardStatsRepository {
   /// Fetches member and staff collections from Firestore to compute dashboard statistics.
   Future<DashboardStatsModel> getStats() async {
     try {
-      // Fetch all members and staff (client-side count)
+      // Fetch all members, staff, and diet plans (client-side count)
       final membersSnap = await _firestore.collection('members').get();
       final staffSnap = await _firestore.collection('staff').get();
+      final dietPlansSnap = await _firestore.collection('diet_plans').get();
 
       final members = membersSnap.docs.map((d) => d.data()).toList();
 
@@ -37,11 +38,15 @@ class DashboardStatsRepository {
         return dt.year == now.year && dt.month == now.month;
       }).length;
 
+      // Total diet plans count
+      final totalDietPlans = dietPlansSnap.docs.length;
+
       return DashboardStatsModel(
         totalMembers: totalMembers,
         activeMembers: activeMembers,
         totalStaff: totalStaff,
         newMembersThisMonth: newMembersThisMonth,
+        totalDietPlans: totalDietPlans,
       );
     } catch (e) {
       debugPrint('Error fetching dashboard stats: $e');

@@ -11,11 +11,15 @@ class DashboardStatsModel {
   /// Count of members registered during the current calendar month.
   final int newMembersThisMonth;
 
+  /// Total count of all diet plans.
+  final int totalDietPlans;
+
   const DashboardStatsModel({
     required this.totalMembers,
     required this.activeMembers,
     required this.totalStaff,
     required this.newMembersThisMonth,
+    required this.totalDietPlans,
   });
 
   /// Factory for initial/empty statistics state before data loads.
@@ -24,5 +28,6 @@ class DashboardStatsModel {
         activeMembers: 0,
         totalStaff: 0,
         newMembersThisMonth: 0,
+        totalDietPlans: 0,
       );
 }
