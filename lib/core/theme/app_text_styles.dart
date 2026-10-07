@@ -6,59 +6,59 @@ import 'app_colors.dart';
 class AppTextStyles {
   // Headings
   static TextStyle get headingLarge => GoogleFonts.poppins(
-        fontSize: 32,
-        fontWeight: FontWeight.bold,
-        color: AppColors.textPrimary,
-      );
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+    color: AppColors.primary,
+  );
 
   static TextStyle get headingMedium => GoogleFonts.poppins(
-        fontSize: 24,
-        fontWeight: FontWeight.w600, // semi-bold
-        color: AppColors.textPrimary,
-      );
+    fontSize: 24,
+    fontWeight: FontWeight.w600, // semi-bold
+    color: AppColors.primary,
+  );
 
   static TextStyle get headingSmall => GoogleFonts.poppins(
-        fontSize: 20,
-        fontWeight: FontWeight.w600, // semi-bold
-        color: AppColors.textPrimary,
-      );
+    fontSize: 20,
+    fontWeight: FontWeight.w600, // semi-bold
+    color: AppColors.primary,
+  );
 
   // Subheadings
   static TextStyle get subtitleLarge => GoogleFonts.poppins(
-        fontSize: 18,
-        fontWeight: FontWeight.w600, // semi-bold
-        color: AppColors.textPrimary,
-      );
+    fontSize: 18,
+    fontWeight: FontWeight.w600, // semi-bold
+    color: AppColors.primary,
+  );
 
   static TextStyle get subtitleMedium => GoogleFonts.poppins(
-        fontSize: 16,
-        fontWeight: FontWeight.w500, // medium
-        color: AppColors.textPrimary,
-      );
+    fontSize: 16,
+    fontWeight: FontWeight.w500, // medium
+    color: AppColors.primary,
+  );
 
   // Body
   static TextStyle get bodyLarge => GoogleFonts.poppins(
-        fontSize: 16,
-        fontWeight: FontWeight.w400, // regular
-        color: AppColors.textPrimary,
-      );
+    fontSize: 16,
+    fontWeight: FontWeight.w400, // regular
+    color: AppColors.primary,
+  );
 
   static TextStyle get bodyMedium => GoogleFonts.poppins(
-        fontSize: 14,
-        fontWeight: FontWeight.w400, // regular
-        color: AppColors.textPrimary,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w400, // regular
+    color: AppColors.primary,
+  );
 
   // Captions
   static TextStyle get caption => GoogleFonts.poppins(
-        fontSize: 12,
-        fontWeight: FontWeight.w400, // regular
-        color: AppColors.textSecondary,
-      );
+    fontSize: 12,
+    fontWeight: FontWeight.w400, // regular
+    color: AppColors.textSecondary,
+  );
 
   // Buttons
   static TextStyle get buttonText => GoogleFonts.poppins(
-        fontSize: 16,
-        fontWeight: FontWeight.w600, // semi-bold
-      );
+    fontSize: 16,
+    fontWeight: FontWeight.w600, // semi-bold
+  );
 }
