@@ -1,49 +1,56 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../model/user_profile_model.dart';
 import 'package:flutter/foundation.dart';
+
+import '../model/user_profile_model.dart';
 
 class ProfileRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Fetches the profile for the given [uid] from either the staff
+  /// or members collection.
+  ///
+  /// Uses direct doc reads (doc ID = uid) instead of queries, because
+  /// Firestore Security Rules with `docId == request.auth.uid` only
+  /// allow direct reads, not queries.
   Future<UserProfileModel?> getUserProfile(String uid) async {
-    debugPrint('DEBUG: getUserProfile called with UID: $uid');
     try {
-      // First search the staff collection
-      final staffQuery = await _firestore
-          .collection('staff')
-          .where('uid', isEqualTo: uid)
-          .limit(1)
-          .get();
+      debugPrint('DEBUG: getUserProfile called with UID: $uid');
 
-      debugPrint('DEBUG: staffQuery.docs.isEmpty: ${staffQuery.docs.isEmpty}');
+      // ── 1. Try staff collection (doc ID = uid) ──
+      final staffDoc = await _firestore.collection('staff').doc(uid).get();
 
-      if (staffQuery.docs.isNotEmpty) {
-        final data = staffQuery.docs.first.data();
+      if (staffDoc.exists) {
+        final data = staffDoc.data()!;
         debugPrint('DEBUG: staff document found. Data: $data');
         return UserProfileModel.fromFirestore(data);
       }
 
-      debugPrint('DEBUG: staff is empty, searching members');
+      debugPrint('DEBUG: no staff document with doc ID = $uid');
 
-      // If no staff document is found, search the members collection
-      final membersQuery = await _firestore
-          .collection('members')
-          .where('uid', isEqualTo: uid)
-          .limit(1)
-          .get();
+      // ── 2. Try members collection (doc ID = uid) ──
+      final memberDoc = await _firestore.collection('members').doc(uid).get();
 
-      if (membersQuery.docs.isNotEmpty) {
-        final data = membersQuery.docs.first.data();
-        debugPrint('DEBUG: members document found. Data: $data');
-        return UserProfileModel.fromFirestore(data);
+      if (memberDoc.exists) {
+        final data = memberDoc.data()!;
+        debugPrint('DEBUG: member document found. Data: $data');
+
+        // Member docs don't have a `role` field.
+        // Inject `role: 'member'` so UserProfileModel and AuthGate
+        // can route correctly.
+        final dataWithRole = Map<String, dynamic>.from(data);
+        if ((dataWithRole['role'] as String?)?.isEmpty ?? true) {
+          dataWithRole['role'] = 'member';
+        }
+
+        return UserProfileModel.fromFirestore(dataWithRole);
       }
 
-      // If neither staff nor member is found
-      debugPrint('DEBUG: neither staff nor member found');
+      debugPrint('DEBUG: no member document with doc ID = $uid');
+
+      // ── 3. Not found ──
       return null;
     } catch (e) {
       debugPrint('DEBUG: Caught exception in getUserProfile: $e');
-      debugPrint('Error fetching user profile: $e');
       return null;
     }
   }
