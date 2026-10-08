@@ -1,5 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Warning level for membership expiry.
+enum MembershipWarningLevel {
+  normal,     // > 7 days remaining
+  warning,    // 3-7 days remaining
+  critical,   // 1-2 days remaining
+  expired,    // 0 or negative days
+}
+
 class MemberModel {
   /// Firebase Auth UID — also used as the Firestore document ID
   final String uid;
@@ -13,7 +21,7 @@ class MemberModel {
   /// Contact phone number
   final String phone;
 
-  /// Contact email address (e.g. "bilawal@gym.com")
+  /// Contact email address (optional)
   final String email;
 
   /// Physical residential address (optional)
@@ -37,7 +45,7 @@ class MemberModel {
   /// When the current membership expires
   final DateTime? expiryDate;
 
-  /// Timestamp when the member joined the gym
+  /// Timestamp when the member joined
   final DateTime createdAt;
 
   /// Profile image URL (optional)
@@ -144,24 +152,31 @@ class MemberModel {
   }
 
   /// True if the membership has expired based on expiryDate.
-  /// This checks the date directly, regardless of the status field.
   bool get hasExpiredByDate {
     if (expiryDate == null) return false;
     return expiryDate!.isBefore(DateTime.now());
   }
 
   /// Days remaining until expiry. Negative if already expired.
-  /// Returns 0 if expiryDate is null.
   int get daysRemaining {
     if (expiryDate == null) return 0;
     return expiryDate!.difference(DateTime.now()).inDays;
   }
 
   /// True if the effective status should be 'expired'.
-  /// Considers both the status field AND the expiryDate.
   bool get effectiveIsExpired {
     if (status == 'expired') return true;
     if (status == 'active' && hasExpiredByDate) return true;
     return false;
+  }
+
+  /// Warning level based on days remaining.
+  MembershipWarningLevel get warningLevel {
+    if (effectiveIsExpired) return MembershipWarningLevel.expired;
+    final days = daysRemaining;
+    if (days <= 0) return MembershipWarningLevel.expired;
+    if (days <= 2) return MembershipWarningLevel.critical;
+    if (days <= 7) return MembershipWarningLevel.warning;
+    return MembershipWarningLevel.normal;
   }
 }
