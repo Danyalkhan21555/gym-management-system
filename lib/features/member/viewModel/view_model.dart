@@ -8,10 +8,14 @@ class MemberViewModel extends ChangeNotifier {
 
   List<MemberModel> _allMembers = [];
   List<MemberModel> _filteredMembers = [];
+  MemberModel? _currentMember;
+
   bool _isLoading = false;
+  bool _isLoadingMember = false;
   bool _isCreating = false;
   bool _isDeleting = false;
   String? _errorMessage;
+  String? _memberError;
   String? _createError;
   String _searchQuery = '';
 
@@ -21,20 +25,20 @@ class MemberViewModel extends ChangeNotifier {
 
   List<MemberModel> get members => _filteredMembers;
   List<MemberModel> get allMembers => _allMembers;
+  MemberModel? get currentMember => _currentMember;
   bool get isLoading => _isLoading;
+  bool get isLoadingMember => _isLoadingMember;
   bool get isCreating => _isCreating;
   bool get isDeleting => _isDeleting;
   String? get errorMessage => _errorMessage;
+  String? get memberError => _memberError;
   String? get createError => _createError;
   String get searchQuery => _searchQuery;
 
-  /// True when not loading and the visible list is empty.
   bool get isEmpty => !_isLoading && _filteredMembers.isEmpty;
 
-  // ── Read methods ─────────────────────────────────────────────────────────
+  // ── Read: List ───────────────────────────────────────────────────────────
 
-  /// Fetches all members from the repository and applies the current
-  /// search query.
   Future<void> loadMembers() async {
     _isLoading = true;
     _errorMessage = null;
@@ -51,32 +55,51 @@ class MemberViewModel extends ChangeNotifier {
     }
   }
 
-  /// Updates the search query and filters the visible list immediately.
   void searchMembers(String query) {
     _searchQuery = query.trim();
     _applySearch();
     notifyListeners();
   }
 
-  /// Clears any currently displayed error message (list load error).
   void clearError() {
     _errorMessage = null;
     notifyListeners();
   }
 
-  // ── Create member ────────────────────────────────────────────────────────
+  // ── Read: Single Member (for Member Dashboard) ───────────────────────────
 
-  /// Creates a new member:
-  ///   - Uses the receptionist-supplied [email] directly (no auto-generation)
-  ///   - Creates a Firebase Auth account (without logging out the current user)
-  ///   - Writes the member doc to Firestore
-  ///   - Refreshes the member list
-  ///
-  /// Returns the created [MemberModel] on success, null on failure.
+  /// Loads a single member by UID and stores in [_currentMember].
+  Future<void> loadMember(String uid) async {
+    _isLoadingMember = true;
+    _memberError = null;
+    notifyListeners();
+
+    try {
+      _currentMember = await _repository.getMemberById(uid);
+      if (_currentMember == null) {
+        _memberError = 'Member profile not found.';
+      }
+    } catch (e) {
+      _memberError = 'Failed to load member.';
+    } finally {
+      _isLoadingMember = false;
+      notifyListeners();
+    }
+  }
+
+  /// Clears the current member (e.g., on logout).
+  void clearCurrentMember() {
+    _currentMember = null;
+    _memberError = null;
+    notifyListeners();
+  }
+
+  // ── Create ──────────────────────────────────────────────────────────────
+
   Future<MemberModel?> createMember({
     required String name,
     required String phone,
-    required String email, // email entered manually by the receptionist
+    required String email,
     required String password,
     required String address,
     required String gender,
@@ -88,7 +111,6 @@ class MemberViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Pass the receptionist-supplied email directly to the repository
       final member = await _repository.createMember(
         name: name,
         phone: phone,
@@ -106,7 +128,6 @@ class MemberViewModel extends ChangeNotifier {
         return null;
       }
 
-      // Refresh the list so the new member appears immediately
       await loadMembers();
       return member;
     } catch (e) {
@@ -118,15 +139,13 @@ class MemberViewModel extends ChangeNotifier {
     }
   }
 
-  /// Clears the create-member error message.
   void clearCreateError() {
     _createError = null;
     notifyListeners();
   }
 
-  // ── Delete member ────────────────────────────────────────────────────────
+  // ── Delete ──────────────────────────────────────────────────────────────
 
-  /// Permanently deletes a member document and reloads the member list.
   Future<bool> deleteMember(String uid) async {
     _isDeleting = true;
     _errorMessage = null;
@@ -151,8 +170,6 @@ class MemberViewModel extends ChangeNotifier {
 
   // ── Private helpers ──────────────────────────────────────────────────────
 
-  /// Filters [_allMembers] by [_searchQuery] and stores the result in
-  /// [_filteredMembers]. Matches against name, memberId, and phone.
   void _applySearch() {
     if (_searchQuery.isEmpty) {
       _filteredMembers = List.from(_allMembers);

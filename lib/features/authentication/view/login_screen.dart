@@ -170,6 +170,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 56,
                       child: ElevatedButton(
                         onPressed: isLoading ? null : _handleLogin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.dark,
+                          disabledBackgroundColor: AppColors.primary.withValues(
+                            alpha: 0.5,
+                          ),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
                         child: isLoading
                             ? const SizedBox(
                                 height: 24,
@@ -181,7 +192,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                               )
-                            : Text('Login', style: AppTextStyles.buttonText),
+                            : Text(
+                                'Login',
+                                style: AppTextStyles.buttonText.copyWith(
+                                  color: AppColors.dark,
+                                ),
+                              ),
                       ),
                     ),
                   ],

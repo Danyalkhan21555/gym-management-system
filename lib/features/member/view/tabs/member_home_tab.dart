@@ -7,7 +7,7 @@ import '../../../../shared/widgets/glass_card.dart';
 import '../../../admin/view/widgets/admin_announcement_card.dart';
 import '../../../announcements/viewmodel/announcement_viewmodel.dart';
 import '../../../member/model/member_model.dart';
-
+import '../../viewModel/view_model.dart';
 class MemberHomeTab extends StatefulWidget {
   const MemberHomeTab({super.key});
 
@@ -56,15 +56,69 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
   @override
   Widget build(BuildContext context) {
     final authVm = AuthProvider.of(context);
+    final memberVm = context.watch<MemberViewModel>();
     final announcementVm = context.watch<AnnouncementViewModel>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final name = authVm.userProfile?.name ?? 'Member';
+    final member = memberVm.currentMember;
 
-    // TODO: Replace with real MemberModel from Firestore.
-    // For now, use dummy data so UI is visible.
-    final member = _dummyMember(name);
+    // ── Loading State ──
+    if (memberVm.isLoadingMember) {
+      return const Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          ),
+        ),
+      );
+    }
 
-    // Show expiry popup once if critical/expired
+    // ── Error / Not Found State ──
+    if (member == null) {
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    memberVm.memberError ?? 'Unable to load membership.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: isDark ? Colors.white : AppColors.dark,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      final uid = AuthProvider.of(context).userProfile?.uid;
+                      if (uid != null) {
+                        context.read<MemberViewModel>().loadMember(uid);
+                      }
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ── Expiry Popup (once per session) ──
     if (!_hasShownExpiryDialog &&
         (member.warningLevel == MembershipWarningLevel.critical ||
             member.warningLevel == MembershipWarningLevel.expired)) {
@@ -109,21 +163,23 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
 
               const SizedBox(height: 24),
 
-              // ── Warning Banner (if expiring soon) ──
+              // ── Warning Banner ──
               if (member.warningLevel == MembershipWarningLevel.warning ||
-                  member.warningLevel == MembershipWarningLevel.critical)
+                  member.warningLevel == MembershipWarningLevel.critical ||
+                  member.warningLevel == MembershipWarningLevel.expired)
                 _buildWarningBanner(context, member),
 
               if (member.warningLevel == MembershipWarningLevel.warning ||
-                  member.warningLevel == MembershipWarningLevel.critical)
+                  member.warningLevel == MembershipWarningLevel.critical ||
+                  member.warningLevel == MembershipWarningLevel.expired)
                 const SizedBox(height: 16),
 
-              // ── Membership Card (hero) ──
+              // ── Membership Card ──
               _buildMembershipCard(context, member, isDark),
 
               const SizedBox(height: 16),
 
-              // ── Quick Actions (2 glass cards) ──
+              // ── Quick Actions ──
               Row(
                 children: [
                   Expanded(
@@ -145,9 +201,8 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                             child: Icon(
                               Icons.restaurant_menu,
                               size: 22,
-                              color: isDark
-                                  ? AppColors.primary
-                                  : AppColors.dark,
+                              color:
+                                  isDark ? AppColors.primary : AppColors.dark,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -195,9 +250,8 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                             child: Icon(
                               Icons.chat_bubble_outline,
                               size: 22,
-                              color: isDark
-                                  ? AppColors.primary
-                                  : AppColors.dark,
+                              color:
+                                  isDark ? AppColors.primary : AppColors.dark,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -312,7 +366,11 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
     bool isDark,
   ) {
     final warningColor = _warningColor(member.warningLevel);
-    final warningLabel = _warningLabel(member.warningLevel);
+    final warningLabel = _warningLabel(
+      member.warningLevel,
+      member.daysRemaining,
+    );
+    final warningIcon = _warningIcon(member.warningLevel);
 
     return GlassCard(
       padding: const EdgeInsets.all(24),
@@ -342,6 +400,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
           ),
           const SizedBox(height: 12),
 
+          // Plan name
           Text(
             member.planLabel,
             style: TextStyle(
@@ -349,6 +408,22 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
               fontSize: 28,
               fontWeight: FontWeight.w700,
               color: isDark ? Colors.white : AppColors.dark,
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // Expiry subtitle
+          Text(
+            member.expiryDate != null
+                ? 'Expires ${_formatDate(member.expiryDate!)}'
+                : 'No expiry date',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 13,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.6)
+                  : AppColors.textSecondary,
             ),
           ),
 
@@ -363,23 +438,24 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
               backgroundColor: isDark
                   ? Colors.white.withValues(alpha: 0.1)
                   : Colors.black.withValues(alpha: 0.06),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                warningColor,
-              ),
+              valueColor: AlwaysStoppedAnimation<Color>(warningColor),
             ),
           ),
 
           const SizedBox(height: 12),
 
+          // Start and End date labels
           Row(
             children: [
               Text(
-                _formatDate(member.startDate ?? DateTime.now()),
+                member.startDate != null
+                    ? _formatDate(member.startDate!)
+                    : '—',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 12,
+                  fontSize: 11,
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.6)
+                      ? Colors.white.withValues(alpha: 0.5)
                       : AppColors.textSecondary,
                 ),
               ),
@@ -390,9 +466,9 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                     : '—',
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 12,
+                  fontSize: 11,
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.6)
+                      ? Colors.white.withValues(alpha: 0.5)
                       : AppColors.textSecondary,
                 ),
               ),
@@ -418,11 +494,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  _warningIcon(member.warningLevel),
-                  size: 16,
-                  color: warningColor,
-                ),
+                Icon(warningIcon, size: 16, color: warningColor),
                 const SizedBox(width: 6),
                 Text(
                   warningLabel,
@@ -443,9 +515,24 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
 
   // ── Warning Banner ──
   Widget _buildWarningBanner(BuildContext context, MemberModel member) {
-    final isCritical =
-        member.warningLevel == MembershipWarningLevel.critical;
+    final isCritical = member.warningLevel ==
+            MembershipWarningLevel.critical ||
+        member.warningLevel == MembershipWarningLevel.expired;
     final color = isCritical ? AppColors.error : const Color(0xFFF59E0B);
+
+    final String message;
+    if (member.warningLevel == MembershipWarningLevel.expired) {
+      final expired = member.daysRemaining.abs();
+      message = expired == 0
+          ? 'Your membership has expired today. Please contact reception.'
+          : 'Your membership expired $expired days ago. Please contact reception.';
+    } else if (isCritical) {
+      message =
+          'Your membership expires in ${member.daysRemaining} days! Renew soon.';
+    } else {
+      message =
+          'Your membership expires in ${member.daysRemaining} days. Renew soon.';
+    }
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -467,9 +554,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              isCritical
-                  ? 'Your membership expires in ${member.daysRemaining} days!'
-                  : 'Your membership expires in ${member.daysRemaining} days. Renew soon.',
+              message,
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 13,
@@ -521,7 +606,8 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,
-            color: isDark ? Colors.white.withValues(alpha: 0.8) : AppColors.dark,
+            color:
+                isDark ? Colors.white.withValues(alpha: 0.8) : AppColors.dark,
           ),
         ),
         actions: [
@@ -552,7 +638,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
     );
   }
 
-  // ── Helper: warning color ──
+  // ── Warning color ──
   Color _warningColor(MembershipWarningLevel level) {
     switch (level) {
       case MembershipWarningLevel.normal:
@@ -565,7 +651,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
     }
   }
 
-  // ── Helper: warning icon ──
+  // ── Warning icon ──
   IconData _warningIcon(MembershipWarningLevel level) {
     switch (level) {
       case MembershipWarningLevel.normal:
@@ -578,32 +664,35 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
     }
   }
 
-  // ── Helper: warning label ──
-  String _warningLabel(MembershipWarningLevel level) {
-    // TODO: get member from Firestore for real values
-    return 'Active';
+  // ── Warning label (dynamic) ──
+  String _warningLabel(MembershipWarningLevel level, int days) {
+    switch (level) {
+      case MembershipWarningLevel.normal:
+        return '$days days remaining';
+      case MembershipWarningLevel.warning:
+        return '$days days remaining';
+      case MembershipWarningLevel.critical:
+        return 'Only $days days left!';
+      case MembershipWarningLevel.expired:
+        final expired = days.abs();
+        if (expired == 0) return 'Expired today';
+        return 'Expired $expired days ago';
+    }
   }
 
-  // ── Helper: progress value (0 to 1) ──
+  // ── Progress (real) ──
   double _progressValue(MemberModel member) {
-    // TODO: compute real progress from startDate/expiryDate
-    return 0.5;
-  }
+    if (member.startDate == null || member.expiryDate == null) {
+      return 0;
+    }
+    final totalDuration =
+        member.expiryDate!.difference(member.startDate!).inSeconds;
+    if (totalDuration <= 0) return 1.0;
 
-  // ── TEMP: dummy member for UI preview ──
-  MemberModel _dummyMember(String name) {
-    final now = DateTime.now();
-    return MemberModel(
-      uid: 'dummy',
-      memberId: 'MEM001',
-      name: name,
-      phone: '03001234567',
-      status: 'active',
-      plan: 'premium',
-      duration: 3,
-      startDate: now.subtract(const Duration(days: 60)),
-      expiryDate: now.add(const Duration(days: 30)),
-      createdAt: now,
-    );
+    final elapsed =
+        DateTime.now().difference(member.startDate!).inSeconds;
+
+    final progress = elapsed / totalDuration;
+    return progress.clamp(0.0, 1.0);
   }
 }

@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../memberships/halper/membership_halper.dart';
 import '../repository/auth_repository.dart';
 import '../repository/profile_repository.dart';
 import '../model/auth_user_model.dart';
 import '../model/user_profile_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../memberships/halper/membership_halper.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthRepository _authRepository;
@@ -17,11 +18,22 @@ class AuthViewModel extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  // ── Splash guard: true once checkCurrentUser() has finished ──
+  // ── Splash guard ──
   bool _hasCheckedCurrentUser = false;
   bool get hasCheckedCurrentUser => _hasCheckedCurrentUser;
 
+  // ── Change password state ──
+  bool _isChangingPassword = false;
+  String? _changePasswordError;
+  String? _changePasswordSuccess;
+
+  bool get isChangingPassword => _isChangingPassword;
+  String? get changePasswordError => _changePasswordError;
+  String? get changePasswordSuccess => _changePasswordSuccess;
+
   AuthViewModel(this._authRepository, this._profileRepository);
+
+  // ── Login ───────────────────────────────────────────────────────────────
 
   Future<void> login(String email, String password) async {
     errorMessage = null;
@@ -32,12 +44,14 @@ class AuthViewModel extends ChangeNotifier {
       currentUser = await _authRepository.signIn(email, password);
 
       if (currentUser != null) {
-        userProfile = await _profileRepository.getUserProfile(currentUser!.uid);
+        userProfile = await _profileRepository.getUserProfile(
+          currentUser!.uid,
+        );
 
         if (userProfile == null) {
           errorMessage = 'User profile not found.';
         } else {
-          // ── Lazy expiry check for members ──
+          // Lazy expiry check for members
           await _checkMembershipExpiry();
         }
       }
@@ -48,19 +62,15 @@ class AuthViewModel extends ChangeNotifier {
         case 'user-not-found':
           errorMessage = 'Invalid email or password.';
           break;
-
         case 'invalid-email':
           errorMessage = 'Please enter a valid email address.';
           break;
-
         case 'too-many-requests':
           errorMessage = 'Too many login attempts. Please try again later.';
           break;
-
         case 'network-request-failed':
           errorMessage = 'Please check your internet connection.';
           break;
-
         default:
           errorMessage = 'Login failed. Please try again.';
       }
@@ -72,18 +82,17 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
+  // ── Logout ──────────────────────────────────────────────────────────────
+
   Future<void> logout() async {
     await _authRepository.signOut();
-
     currentUser = null;
     userProfile = null;
-
     notifyListeners();
   }
 
-  /// Checks whether a Firebase session already exists on app launch.
-  /// Sets [hasCheckedCurrentUser] = true when complete, which dismisses
-  /// the splash screen in AuthGate.
+  // ── Check current user (session restore) ────────────────────────────────
+
   Future<void> checkCurrentUser() async {
     currentUser = _authRepository.getCurrentUser();
 
@@ -93,28 +102,79 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       if (userProfile != null) {
-        // ── Lazy expiry check for members ──
         await _checkMembershipExpiry();
       }
     } else {
       userProfile = null;
     }
 
-    // ── Mark initialisation complete so splash screen is dismissed ──
     _hasCheckedCurrentUser = true;
     notifyListeners();
   }
 
-  // ── Private helpers ──────────────────────────────────────────────────────
+  // ── Change password ─────────────────────────────────────────────────────
 
-  /// If the current user is a member, checks their membership expiry
-  /// and updates Firestore if needed. Refreshes userProfile afterwards.
+  /// Attempts to change the current user's password.
+  /// Returns true on success.
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _isChangingPassword = true;
+    _changePasswordError = null;
+    _changePasswordSuccess = null;
+    notifyListeners();
+
+    try {
+      await _authRepository.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+
+      _changePasswordSuccess = 'Password updated successfully.';
+      return true;
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'wrong-password':
+        case 'invalid-credential':
+          _changePasswordError = 'Current password is incorrect.';
+          break;
+        case 'weak-password':
+          _changePasswordError = 'New password is too weak.';
+          break;
+        case 'requires-recent-login':
+          _changePasswordError =
+              'Please log out and log in again before changing your password.';
+          break;
+        case 'network-request-failed':
+          _changePasswordError = 'Check your internet connection.';
+          break;
+        default:
+          _changePasswordError = 'Failed to update password. Try again.';
+      }
+      return false;
+    } catch (e) {
+      _changePasswordError = 'Something went wrong. Please try again.';
+      return false;
+    } finally {
+      _isChangingPassword = false;
+      notifyListeners();
+    }
+  }
+
+  void clearChangePasswordState() {
+    _changePasswordError = null;
+    _changePasswordSuccess = null;
+    notifyListeners();
+  }
+
+  // ── Private: membership expiry check ────────────────────────────────────
+
   Future<void> _checkMembershipExpiry() async {
     if (userProfile == null) return;
     if (userProfile!.role != 'member') return;
 
     try {
-      // Fetch the member doc to get expiryDate and current status
       final memberDoc = await FirebaseFirestore.instance
           .collection('members')
           .doc(userProfile!.uid)
@@ -135,12 +195,12 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       if (wasUpdated) {
-        // Refresh profile so UI reflects the new status
-        userProfile = await _profileRepository.getUserProfile(currentUser!.uid);
+        userProfile = await _profileRepository.getUserProfile(
+          currentUser!.uid,
+        );
       }
     } catch (e) {
       debugPrint('Error checking membership expiry: $e');
-      // Silent fail — do not block login
     }
   }
 }
