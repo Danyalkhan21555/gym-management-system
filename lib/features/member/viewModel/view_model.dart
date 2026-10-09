@@ -14,9 +14,11 @@ class MemberViewModel extends ChangeNotifier {
   bool _isLoadingMember = false;
   bool _isCreating = false;
   bool _isDeleting = false;
+  bool _isUpdatingMember = false;
   String? _errorMessage;
   String? _memberError;
   String? _createError;
+  String? _updateMemberError;
   String _searchQuery = '';
 
   MemberViewModel(this._repository);
@@ -30,9 +32,11 @@ class MemberViewModel extends ChangeNotifier {
   bool get isLoadingMember => _isLoadingMember;
   bool get isCreating => _isCreating;
   bool get isDeleting => _isDeleting;
+  bool get isUpdatingMember => _isUpdatingMember;
   String? get errorMessage => _errorMessage;
   String? get memberError => _memberError;
   String? get createError => _createError;
+  String? get updateMemberError => _updateMemberError;
   String get searchQuery => _searchQuery;
 
   bool get isEmpty => !_isLoading && _filteredMembers.isEmpty;
@@ -66,9 +70,8 @@ class MemberViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Read: Single Member (for Member Dashboard) ───────────────────────────
+  // ── Read: Single Member ──────────────────────────────────────────────────
 
-  /// Loads a single member by UID and stores in [_currentMember].
   Future<void> loadMember(String uid) async {
     _isLoadingMember = true;
     _memberError = null;
@@ -87,7 +90,6 @@ class MemberViewModel extends ChangeNotifier {
     }
   }
 
-  /// Clears the current member (e.g., on logout).
   void clearCurrentMember() {
     _currentMember = null;
     _memberError = null;
@@ -141,6 +143,59 @@ class MemberViewModel extends ChangeNotifier {
 
   void clearCreateError() {
     _createError = null;
+    notifyListeners();
+  }
+
+  // ── Update (member self-edit) ────────────────────────────────────────────
+
+  /// Updates a member's editable fields.
+  /// [uid] is the Firestore doc ID of the member to update.
+  /// Also refreshes [_currentMember] if it matches [uid].
+  Future<bool> updateMember({
+    required String uid,
+    required String name,
+    required String phone,
+    required String address,
+    required String gender,
+  }) async {
+    _isUpdatingMember = true;
+    _updateMemberError = null;
+    notifyListeners();
+
+    try {
+      final success = await _repository.updateMember(
+        uid: uid,
+        name: name,
+        phone: phone,
+        address: address,
+        gender: gender,
+      );
+
+      if (success) {
+        // Refresh current member locally if this was the current member
+        if (_currentMember != null && _currentMember!.uid == uid) {
+          _currentMember = _currentMember!.copyWith(
+            name: name,
+            phone: phone,
+            address: address,
+            gender: gender,
+          );
+        }
+      } else {
+        _updateMemberError = 'Failed to update profile.';
+      }
+      return success;
+    } catch (e) {
+      _updateMemberError = 'Something went wrong. Please try again.';
+      return false;
+    } finally {
+      _isUpdatingMember = false;
+      notifyListeners();
+    }
+  }
+
+  void clearUpdateMemberError() {
+    _updateMemberError = null;
     notifyListeners();
   }
 

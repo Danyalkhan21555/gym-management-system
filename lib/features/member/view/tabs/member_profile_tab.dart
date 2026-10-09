@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../authentication/view/change_password_screen.dart';
+import '../../viewModel/view_model.dart';
+import '../edit_profile_screen.dart';
 
 /// Member Profile Tab — glass design with profile details and logout.
 class MemberProfileTab extends StatelessWidget {
@@ -11,9 +14,10 @@ class MemberProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = AuthProvider.of(context);
+    final authVm = AuthProvider.of(context);
+    final memberVm = context.watch<MemberViewModel>();
 
-    final profile = viewModel.userProfile;
+    final profile = authVm.userProfile;
 
     // Safe fallbacks
     final name = profile?.name ?? 'Member';
@@ -113,7 +117,79 @@ class MemberProfileTab extends StatelessWidget {
                 ),
               ),
 
-             
+              const SizedBox(height: 16),
+
+              // ── Edit Profile Card ──
+              GlassCard(
+                padding: const EdgeInsets.all(20),
+                onTap: () async {
+                  final member = memberVm.currentMember;
+                  if (member == null) return;
+
+                  final updated = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditProfileScreen(member: member),
+                    ),
+                  );
+
+                  if (updated == true && context.mounted) {
+                    final uid = authVm.userProfile?.uid;
+                    if (uid != null) {
+                      context.read<MemberViewModel>().loadMember(uid);
+                    }
+                  }
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.edit_outlined,
+                        size: 22,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Edit Profile',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimaryOf(context),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Update your personal details',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              color: AppColors.textSecondaryOf(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: AppColors.textSecondaryOf(context),
+                    ),
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 16),
 
               // ── Change Password Card ──
@@ -183,7 +259,7 @@ class MemberProfileTab extends StatelessWidget {
               SizedBox(
                 height: 56,
                 child: OutlinedButton(
-                  onPressed: () => _confirmLogout(context, viewModel),
+                  onPressed: () => _confirmLogout(context, authVm),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.error, width: 1.5),
                     foregroundColor: AppColors.error,

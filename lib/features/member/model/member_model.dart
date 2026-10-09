@@ -179,4 +179,32 @@ class MemberModel {
     if (days <= 7) return MembershipWarningLevel.warning;
     return MembershipWarningLevel.normal;
   }
+
+  // ── copyWith ──────────────────────────────────────────────────────────────
+
+  /// Returns a copy of this model with the given editable fields replaced.
+  /// Only name, phone, address, and gender are user-editable.
+  MemberModel copyWith({
+    String? name,
+    String? phone,
+    String? address,
+    String? gender,
+  }) {
+    return MemberModel(
+      uid:          uid,
+      memberId:     memberId,
+      name:         name ?? this.name,
+      phone:        phone ?? this.phone,
+      email:        email,
+      address:      address ?? this.address,
+      gender:       gender ?? this.gender,
+      status:       status,
+      plan:         plan,
+      duration:     duration,
+      startDate:    startDate,
+      expiryDate:   expiryDate,
+      createdAt:    createdAt,
+      profileImage: profileImage,
+    );
+  }
 }

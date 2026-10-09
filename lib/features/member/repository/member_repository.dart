@@ -153,6 +153,30 @@ class MemberRepository {
     }
   }
 
+  /// Updates the editable fields of a member document.
+  /// Only name, phone, address, gender are editable.
+  /// Returns true on success.
+  Future<bool> updateMember({
+    required String uid,
+    required String name,
+    required String phone,
+    required String address,
+    required String gender,
+  }) async {
+    try {
+      await _firestore.collection(_collection).doc(uid).update({
+        'name': name,
+        'phone': phone,
+        'address': address,
+        'gender': gender,
+      });
+      return true;
+    } catch (e) {
+      debugPrint('Error updating member: $e');
+      return false;
+    }
+  }
+
   /// Renews a membership by updating plan, duration, and dates.
   /// Also sets status back to 'active'.
   Future<bool> renewMembership({
