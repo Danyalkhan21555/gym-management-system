@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/glass_card.dart';
+import '../../../authentication/view/change_password_screen.dart';
 
 /// Member Profile Tab — glass design with profile details and logout.
 class MemberProfileTab extends StatelessWidget {
@@ -108,6 +109,70 @@ class MemberProfileTab extends StatelessWidget {
                     _buildInfoRow(context, 'Version', '1.0.0'),
                     _buildDivider(context),
                     _buildInfoRow(context, 'Made by', 'dbaCoders'),
+                  ],
+                ),
+              ),
+
+             
+              const SizedBox(height: 16),
+
+              // ── Change Password Card ──
+              GlassCard(
+                padding: const EdgeInsets.all(20),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ChangePasswordScreen(),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.lock_outline,
+                        size: 22,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Change Password',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimaryOf(context),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Update your account password',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              color: AppColors.textSecondaryOf(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: AppColors.textSecondaryOf(context),
+                    ),
                   ],
                 ),
               ),
