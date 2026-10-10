@@ -10,6 +10,7 @@ class ChatViewModel extends ChangeNotifier {
   List<MessageModel> _messages = [];
   bool _isLoadingMessages = false;
   bool _isSending = false;
+  bool _isClearing = false;
   String? _errorMessage;
   StreamSubscription<List<MessageModel>>? _messagesSubscription;
 
@@ -20,6 +21,7 @@ class ChatViewModel extends ChangeNotifier {
   List<MessageModel> get messages => _messages;
   bool get isLoadingMessages => _isLoadingMessages;
   bool get isSending => _isSending;
+  bool get isClearing => _isClearing;
   String? get errorMessage => _errorMessage;
 
   // ── Methods ──────────────────────────────────────────────────────────────────
@@ -98,6 +100,26 @@ class ChatViewModel extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// Deletes the entire conversation and all messages.
+  Future<bool> clearChat(String roomId) async {
+    _isClearing = true;
+    notifyListeners();
+
+    try {
+      final success = await _repository.deleteConversation(roomId);
+      if (success) {
+        // Clear local message list
+        _messages = [];
+      }
+      return success;
+    } catch (e) {
+      return false;
+    } finally {
+      _isClearing = false;
+      notifyListeners();
+    }
   }
 
   @override

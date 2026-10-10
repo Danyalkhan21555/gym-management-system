@@ -115,9 +115,9 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: AdminStatCard(
-                      icon: Icons.restaurant_outlined,
-                      number: stats.totalDietPlans.toString(),
-                      label: 'Diet Plans',
+                      icon: Icons.group_outlined,
+                      number: stats.totalMembers.toString(),
+                      label: 'Total Members',
                     ),
                   ),
                 ],

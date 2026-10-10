@@ -170,4 +170,35 @@ class ChatRepository {
       );
     });
   }
+
+  /// Deletes an entire conversation including all messages.
+  /// Returns true on success.
+  Future<bool> deleteConversation(String roomId) async {
+    try {
+      // 1. Delete all messages in the subcollection
+      final messagesSnap = await _firestore
+          .collection(_conversationsCollection)
+          .doc(roomId)
+          .collection(_messagesSubcollection)
+          .get();
+
+      // Firestore batch delete (max 500 per batch)
+      final batch = _firestore.batch();
+      for (final doc in messagesSnap.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+
+      // 2. Delete the conversation doc itself
+      await _firestore
+          .collection(_conversationsCollection)
+          .doc(roomId)
+          .delete();
+
+      return true;
+    } catch (e) {
+      debugPrint('Error deleting conversation: $e');
+      return false;
+    }
+  }
 }

@@ -202,11 +202,21 @@ class MemberRepository {
     }
   }
 
-  /// Permanently deletes the member Firestore document.
+  /// Permanently deletes the member Firestore document and any associated
+  /// diet plan document (doc ID = member uid).
   /// Does NOT delete the Firebase Auth account (client SDK can't).
   Future<bool> deleteMember(String uid) async {
     try {
+      // Delete member doc
       await _firestore.collection(_collection).doc(uid).delete();
+
+      // Delete diet plan if exists
+      try {
+        await _firestore.collection('diet_plans').doc(uid).delete();
+      } catch (e) {
+        debugPrint('Failed to delete diet plan for $uid: $e');
+      }
+
       return true;
     } catch (e) {
       debugPrint('Error deleting member: $e');

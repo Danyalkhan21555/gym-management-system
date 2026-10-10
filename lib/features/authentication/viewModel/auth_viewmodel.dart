@@ -101,15 +101,18 @@ class AuthViewModel extends ChangeNotifier {
         currentUser!.uid,
       );
 
+      _hasCheckedCurrentUser = true;
+      notifyListeners();
+
+      // Fire-and-forget: run in background
       if (userProfile != null) {
-        await _checkMembershipExpiry();
+        _checkMembershipExpiry();
       }
     } else {
       userProfile = null;
+      _hasCheckedCurrentUser = true;
+      notifyListeners();
     }
-
-    _hasCheckedCurrentUser = true;
-    notifyListeners();
   }
 
   // ── Change password ─────────────────────────────────────────────────────

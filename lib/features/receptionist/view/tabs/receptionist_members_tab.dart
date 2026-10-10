@@ -101,7 +101,15 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
             ),
 
             // ── List area ──────────────────────────────────────────────────
-            Expanded(child: _buildList(context, viewModel)),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await context.read<MemberViewModel>().loadMembers();
+                },
+                color: AppColors.primary,
+                child: _buildList(context, viewModel),
+              ),
+            ),
           ],
         ),
       ),
@@ -169,41 +177,47 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
 
     // Empty state
     if (viewModel.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.people_outline,
-                size: 48,
-                color: AppColors.textSecondary,
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.people_outline,
+                    size: 48,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'No members yet',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.dark,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Members added by receptionist will appear here.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              const Text(
-                'No members yet',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Members added by receptionist will appear here.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       );
     }
 
