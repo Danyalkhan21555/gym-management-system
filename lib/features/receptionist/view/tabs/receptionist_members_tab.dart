@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../member/model/member_model.dart';
 import '../../../member/view/member_detail_screen.dart';
 // Fix case-sensitivity and directory depth for MemberViewModel import
 import '../../../member/viewModel/view_model.dart';
+import 'receptionist_create_tab.dart';
 
 class ReceptionistMembersTab extends StatefulWidget {
-  const ReceptionistMembersTab({super.key});
+  final VoidCallback? onAddMemberTap;
+
+  const ReceptionistMembersTab({super.key, this.onAddMemberTap});
 
   @override
   State<ReceptionistMembersTab> createState() => _ReceptionistMembersTabState();
@@ -24,12 +28,32 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
     });
   }
 
+  void _openCreateMember() {
+    if (widget.onAddMemberTap != null) {
+      widget.onAddMemberTap!();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(child: ReceptionistCreateTab()),
+          ),
+        ),
+      ).then((_) {
+        if (mounted) {
+          context.read<MemberViewModel>().loadMembers();
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<MemberViewModel>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,17 +70,17 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
                       fontFamily: 'Poppins',
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.dark,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${viewModel.members.length} members',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -66,32 +90,41 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 14,
-                      color: AppColors.dark,
+                      color: Colors.white,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Search by name, ID, or phone',
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.search,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: Colors.white.withValues(alpha: 0.06),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          width: 1,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          width: 1,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 14),
                     ),
@@ -113,6 +146,20 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
           ],
         ),
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 88),
+        child: FloatingActionButton(
+          onPressed: _openCreateMember,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.dark,
+          elevation: 8,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Icon(Icons.add, size: 26),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -133,10 +180,10 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.error_outline,
                 size: 40,
-                color: AppColors.textSecondary,
+                color: Colors.white.withValues(alpha: 0.6),
               ),
               const SizedBox(height: 12),
               Text(
@@ -146,7 +193,7 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 16),
@@ -187,10 +234,10 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.people_outline,
                     size: 48,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                   const SizedBox(height: 12),
                   const Text(
@@ -199,18 +246,18 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
                       fontFamily: 'Poppins',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.dark,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Members added by receptionist will appear here.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -223,7 +270,7 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
 
     // Members list
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
       itemCount: viewModel.members.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
@@ -244,13 +291,11 @@ class _MemberListItem extends StatelessWidget {
   Color _statusColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return AppColors.primary;
+        return AppColors.primary.withValues(alpha: 0.2);
       case 'inactive':
-        return Colors.grey;
       case 'expired':
-        return AppColors.error;
       default:
-        return Colors.grey;
+        return Colors.white.withValues(alpha: 0.1);
     }
   }
 
@@ -258,30 +303,19 @@ class _MemberListItem extends StatelessWidget {
   Color _statusTextColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
-        return AppColors.dark;
+        return AppColors.primary;
       case 'inactive':
-        return Colors.grey[700] ?? Colors.grey;
       case 'expired':
-        return AppColors.error;
       default:
-        return Colors.grey[700] ?? Colors.grey;
+        return Colors.white.withValues(alpha: 0.6);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      borderRadius: 20,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -316,7 +350,7 @@ class _MemberListItem extends StatelessWidget {
                         fontFamily: 'Poppins',
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.dark,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),
@@ -333,17 +367,17 @@ class _MemberListItem extends StatelessWidget {
                           fontFamily: 'Poppins',
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.dark,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '${member.memberId} • ${member.phone}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondary,
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -354,9 +388,7 @@ class _MemberListItem extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: _statusColor(
-                            member.status,
-                          ).withValues(alpha: 0.15),
+                          color: _statusColor(member.status),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -375,7 +407,7 @@ class _MemberListItem extends StatelessWidget {
                 const SizedBox(width: 8),
                 // ── 3-dot action menu ──
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+                  icon: Icon(Icons.more_vert, color: Colors.white.withValues(alpha: 0.6)),
                   onSelected: (value) {
                     if (value == 'view') {
                       Navigator.push(

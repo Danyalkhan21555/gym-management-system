@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 
 class AdminStatCard extends StatelessWidget {
   final IconData icon;
@@ -15,19 +16,9 @@ class AdminStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface, // 0xFFFFFFFF
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      borderRadius: 20,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,7 +29,7 @@ class AdminStatCard extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, size: 22, color: AppColors.dark),
+            child: Icon(icon, size: 22, color: AppColors.primary),
           ),
           const SizedBox(height: 16),
           Text(
@@ -47,17 +38,17 @@ class AdminStatCard extends StatelessWidget {
               fontFamily: 'Poppins',
               fontSize: 26,
               fontWeight: FontWeight.w700,
-              color: AppColors.dark,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+              color: Colors.white.withValues(alpha: 0.6),
             ),
           ),
         ],

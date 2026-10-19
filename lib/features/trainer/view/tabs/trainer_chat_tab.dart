@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../chat/repository/chat_repository.dart';
 import '../../../chat/view/chat_screen.dart';
 import '../../../member/model/member_model.dart';
@@ -67,7 +68,7 @@ class _TrainerChatTabState extends State<TrainerChatTab> {
         memberVm.members.where((m) => m.isActive).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,17 +85,17 @@ class _TrainerChatTabState extends State<TrainerChatTab> {
                       fontFamily: 'Poppins',
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.dark,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${activeMembers.length} members',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -112,7 +113,7 @@ class _TrainerChatTabState extends State<TrainerChatTab> {
                   : activeMembers.isEmpty
                       ? _buildEmpty()
                       : ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
                           itemCount: activeMembers.length,
                           separatorBuilder: (context, index) =>
                               const SizedBox(height: 12),
@@ -132,39 +133,41 @@ class _TrainerChatTabState extends State<TrainerChatTab> {
   }
 
   Widget _buildEmpty() {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.people_outline,
-              size: 48,
-              color: AppColors.textSecondary,
-            ),
-            SizedBox(height: 12),
-            Text(
-              'No active members',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.dark,
+        padding: const EdgeInsets.all(32),
+        child: GlassCard(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.people_outline,
+                size: 48,
+                color: Colors.white.withValues(alpha: 0.6),
               ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Active members will appear here for messaging.',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 13,
-                color: AppColors.textSecondary,
+              const SizedBox(height: 12),
+              const Text(
+                'No active members',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                'Active members will appear here for messaging.',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 13,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -183,81 +186,66 @@ class _MemberChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Avatar with first letter
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      borderRadius: 20,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // Avatar with first letter
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  member.initial,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
                   ),
-                  child: Center(
-                    child: Text(
-                      member.initial,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.dark,
-                      ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    member.name,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        member.name,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.dark,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        member.memberId,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 2),
+                  Text(
+                    member.memberId,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
                   ),
-                ),
-                const Icon(
-                  Icons.chat_bubble_outline,
-                  size: 20,
-                  color: AppColors.textSecondary,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 20,
+              color: Colors.white.withValues(alpha: 0.6),
+            ),
+          ],
         ),
       ),
     );

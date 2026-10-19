@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../admin/view/widgets/admin_announcement_card.dart';
 import '../../../admin/view/widgets/admin_stat_card.dart';
 import '../../../admin/viewmodel/dashboard_stats_viewmodel.dart';
@@ -80,10 +81,10 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
     final stats = statsVm.stats;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -94,17 +95,17 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Welcome back',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -140,7 +141,7 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 12),
@@ -215,25 +216,14 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 12),
 
               if (announcementVm.isLoading)
-                Container(
+                GlassCard(
                   height: 120,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
                   child: const Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
@@ -246,39 +236,34 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
                   ),
                 )
               else
-                Container(
+                GlassCard(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Column(
+                  child: Column(
                     children: [
                       Icon(
                         Icons.campaign_outlined,
                         size: 32,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
-                      SizedBox(height: 8),
-                      Text(
+                      const SizedBox(height: 8),
+                      const Text(
                         'No announcement yet',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.dark,
+                          color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Check back later for updates from the admin.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                       ),
                     ],

@@ -8,12 +8,11 @@ import 'features/authentication/repository/profile_repository.dart';
 import 'features/authentication/viewModel/auth_viewmodel.dart';
 import 'features/authentication/view/auth_gate.dart';
 import 'firebase_options.dart';
+import 'shared/widgets/glass_bottom_nav_preview.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -30,10 +29,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _authViewModel = AuthViewModel(
-      AuthRepository(),
-      ProfileRepository(),
-    )..checkCurrentUser();
+    _authViewModel = AuthViewModel(AuthRepository(), ProfileRepository())
+      ..checkCurrentUser();
   }
 
   @override

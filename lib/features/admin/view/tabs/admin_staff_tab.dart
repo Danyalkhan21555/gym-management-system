@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../staff/model/staff_model.dart';
 import '../../../staff/view/create_staff_screen.dart';
 import '../../../staff/viewmodel/staff_viewmodel.dart';
@@ -28,7 +29,7 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
     final viewModel = context.watch<StaffViewModel>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       floatingActionButton: FloatingActionButton(
         onPressed: _openCreateStaff,
         backgroundColor: AppColors.primary,
@@ -55,17 +56,17 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
                       fontFamily: 'Poppins',
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.dark,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${viewModel.staff.length} members',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.textSecondary,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -75,32 +76,41 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 14,
-                      color: AppColors.dark,
+                      color: Colors.white,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Search by name, ID, or role',
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.5),
                       ),
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.search,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: Colors.white.withValues(alpha: 0.06),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          width: 1,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          width: 1,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1,
+                        ),
                       ),
                       contentPadding:
                           const EdgeInsets.symmetric(vertical: 14),
@@ -148,10 +158,10 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
+              Icon(
                 Icons.error_outline,
                 size: 40,
-                color: AppColors.textSecondary,
+                color: Colors.white.withValues(alpha: 0.6),
               ),
               const SizedBox(height: 12),
               Text(
@@ -161,7 +171,7 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 16),
@@ -197,10 +207,10 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.campaign_outlined,
               size: 40,
-              color: AppColors.textSecondary,
+              color: Colors.white.withValues(alpha: 0.6),
             ),
             const SizedBox(height: 12),
             const Text(
@@ -209,7 +219,7 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
                 fontFamily: 'Poppins',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: AppColors.dark,
+                color: Colors.white,
               ),
             ),
           ],
@@ -219,7 +229,7 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
 
     // Staff list
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
       itemCount: viewModel.staff.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
@@ -241,19 +251,9 @@ class _StaffListItem extends StatelessWidget {
     // Get current logged-in admin UID to prevent self-deactivation
     final currentAdminUid = AuthProvider.of(context).userProfile?.uid;
 
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      borderRadius: 20,
       child: Row(
         children: [
           // ── Avatar circle ──
@@ -273,7 +273,7 @@ class _StaffListItem extends StatelessWidget {
                   fontFamily: 'Poppins',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.dark,
+                  color: AppColors.primary,
                 ),
               ),
             ),
@@ -292,17 +292,17 @@ class _StaffListItem extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.dark,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${staff.roleLabel} • ${staff.profileId}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -312,8 +312,8 @@ class _StaffListItem extends StatelessWidget {
                       horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: staff.isActive
-                        ? AppColors.primary.withValues(alpha: 0.15)
-                        : Colors.grey.withValues(alpha: 0.15),
+                        ? AppColors.primary.withValues(alpha: 0.2)
+                        : Colors.white.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -323,8 +323,8 @@ class _StaffListItem extends StatelessWidget {
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: staff.isActive
-                          ? AppColors.dark
-                          : Colors.grey[700],
+                          ? AppColors.primary
+                          : Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -335,7 +335,7 @@ class _StaffListItem extends StatelessWidget {
           // ── Deactivate / Activate / Remove action menu ──
           if (staff.uid != currentAdminUid)
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+              icon: Icon(Icons.more_vert, color: Colors.white.withValues(alpha: 0.6)),
               onSelected: (value) {
                 if (value == 'deactivate') {
                   _confirmStatusChange(context, staff, 'inactive');

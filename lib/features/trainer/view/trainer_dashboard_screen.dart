@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/glass_background.dart';
+import '../../../shared/widgets/glass_bottom_nav.dart';
 import '../../announcements/repository/announcement_repository.dart';
 import '../../announcements/viewmodel/announcement_viewmodel.dart';
 import '../../chat/repository/chat_repository.dart';
@@ -41,117 +42,54 @@ class _TrainerDashboardScreenState extends State<TrainerDashboardScreen> {
             child: ChangeNotifierProvider(
               create: (_) =>
                   DashboardStatsViewModel(DashboardStatsRepository()), // ← NEW
-              child: Scaffold(
-                body: IndexedStack(
-                  index: _selectedIndex,
-                  children: [
-                    TrainerHomeTab(
-                      onWriteDietTap: () => setState(() => _selectedIndex = 1),
-                    ),
-                    const TrainerDietTab(),
-                    const TrainerChatTab(),
-                    const TrainerProfileTab(),
-                  ],
-                ),
-                bottomNavigationBar: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 16,
-                        offset: const Offset(0, -4),
+              child: GlassBackground(
+                child: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  extendBody: true,
+                  body: IndexedStack(
+                    index: _selectedIndex,
+                    children: [
+                      RepaintBoundary(
+                        child: TrainerHomeTab(
+                          onWriteDietTap: () =>
+                              setState(() => _selectedIndex = 1),
+                        ),
                       ),
+                      const RepaintBoundary(child: TrainerDietTab()),
+                      const RepaintBoundary(child: TrainerChatTab()),
+                      const RepaintBoundary(child: TrainerProfileTab()),
                     ],
                   ),
-                  child: SafeArea(
-                    top: false,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        children: [
-                          _buildNavItem(
-                            0,
-                            'Home',
-                            Icons.home,
-                            Icons.home_outlined,
-                          ),
-                          _buildNavItem(
-                            1,
-                            'Diet Plans',
-                            Icons.restaurant_menu,
-                            Icons.restaurant_menu_outlined,
-                          ),
-                          _buildNavItem(
-                            2,
-                            'Chat',
-                            Icons.chat_bubble,
-                            Icons.chat_bubble_outline,
-                          ),
-                          _buildNavItem(
-                            3,
-                            'Profile',
-                            Icons.person,
-                            Icons.person_outline,
-                          ),
-                        ],
+                  bottomNavigationBar: GlassBottomNav(
+                    currentIndex: _selectedIndex,
+                    onTap: (index) => setState(() => _selectedIndex = index),
+                    items: const [
+                      GlassNavItem(
+                        icon: Icons.home_outlined,
+                        activeIcon: Icons.home,
+                        label: 'Home',
                       ),
-                    ),
+                      GlassNavItem(
+                        icon: Icons.restaurant_outlined,
+                        activeIcon: Icons.restaurant,
+                        label: 'Diet',
+                      ),
+                      GlassNavItem(
+                        icon: Icons.chat_bubble_outline,
+                        activeIcon: Icons.chat_bubble,
+                        label: 'Chat',
+                      ),
+                      GlassNavItem(
+                        icon: Icons.person_outline,
+                        activeIcon: Icons.person,
+                        label: 'Profile',
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(
-    int index,
-    String label,
-    IconData activeIcon,
-    IconData inactiveIcon,
-  ) {
-    final isSelected = _selectedIndex == index;
-
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? activeIcon : inactiveIcon,
-              size: 24,
-              color: isSelected ? AppColors.dark : AppColors.textSecondary,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppColors.dark : AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 3),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.transparent,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
         ),
       ),
     );

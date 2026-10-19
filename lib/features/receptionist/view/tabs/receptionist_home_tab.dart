@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../admin/view/widgets/admin_announcement_card.dart';
 import '../../../admin/view/widgets/admin_stat_card.dart';
 import '../../../admin/viewmodel/dashboard_stats_viewmodel.dart';
@@ -72,10 +73,10 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
     final name = authVm.userProfile?.name ?? 'Receptionist';
     final stats = statsVm.stats;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -86,17 +87,17 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Welcome back',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -132,70 +133,71 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 12),
 
-              InkWell(
-                onTap: () {
-                  widget.onAddMemberTap?.call();
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.dark,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(14),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => widget.onAddMemberTap?.call(),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.dark,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.person_add_alt_1,
+                            size: 24,
+                            color: AppColors.primary,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.person_add_alt_1,
-                          size: 24,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Add New Member',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Add New Member',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Register a new gym member',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white.withValues(alpha: 0.7),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Register a new gym member',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: Colors.white.withValues(alpha: 0.7),
-                      ),
-                    ],
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: Colors.white.withValues(alpha: 0.7),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -209,27 +211,18 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
 
               const SizedBox(height: 12),
 
               if (announcementVm.isLoading)
-                Container(
+                const GlassCard(
                   height: 120,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
+                  width: double.infinity,
+                  borderRadius: 20,
+                  child: Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
                 )
@@ -239,39 +232,36 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
                   dateLabel: _formatAnnouncementDate(announcementVm.announcement!.updatedAt),
                 )
               else
-                Container(
+                GlassCard(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Column(
+                  borderRadius: 20,
+                  child: Column(
                     children: [
                       Icon(
                         Icons.campaign_outlined,
                         size: 32,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
-                      SizedBox(height: 8),
-                      Text(
+                      const SizedBox(height: 8),
+                      const Text(
                         'No announcement yet',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.dark,
+                          color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Check back later for updates from the admin.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                       ),
                     ],

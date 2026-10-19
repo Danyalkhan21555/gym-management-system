@@ -58,7 +58,6 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
     final authVm = AuthProvider.of(context);
     final memberVm = context.watch<MemberViewModel>();
     final announcementVm = context.watch<AnnouncementViewModel>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final name = authVm.userProfile?.name ?? 'Member';
     final member = memberVm.currentMember;
 
@@ -85,19 +84,19 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     memberVm.memberError ?? 'Unable to load membership.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 14,
-                      color: isDark ? Colors.white : AppColors.dark,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -134,18 +133,18 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Greeting ──
               Text(
                 'Hello, $name 👋',
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 26,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 4),
@@ -155,9 +154,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.6)
-                      : AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -175,7 +172,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                 const SizedBox(height: 16),
 
               // ── Membership Card ──
-              _buildMembershipCard(context, member, isDark),
+              _buildMembershipCard(context, member),
 
               const SizedBox(height: 16),
 
@@ -201,18 +198,17 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                             child: Icon(
                               Icons.restaurant_menu,
                               size: 22,
-                              color:
-                                  isDark ? AppColors.primary : AppColors.dark,
+                              color: AppColors.primary,
                             ),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'Diet Plan',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : AppColors.dark,
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -221,9 +217,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 11,
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.6)
-                                  : AppColors.textSecondary,
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -250,18 +244,17 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                             child: Icon(
                               Icons.chat_bubble_outline,
                               size: 22,
-                              color:
-                                  isDark ? AppColors.primary : AppColors.dark,
+                              color: AppColors.primary,
                             ),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'Chat',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.white : AppColors.dark,
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -270,9 +263,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 11,
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.6)
-                                  : AppColors.textSecondary,
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -285,13 +276,13 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
               const SizedBox(height: 24),
 
               // ── Latest Announcement ──
-              Text(
+              const Text(
                 'Latest Announcement',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: isDark ? Colors.white : AppColors.dark,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 12),
@@ -320,19 +311,17 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                       Icon(
                         Icons.campaign_outlined,
                         size: 32,
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.6)
-                            : AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                       const SizedBox(height: 8),
-                      Text(
+                      const Text(
                         'No announcement yet',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? Colors.white : AppColors.dark,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -342,9 +331,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.6)
-                              : AppColors.textSecondary,
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -363,7 +350,6 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
   Widget _buildMembershipCard(
     BuildContext context,
     MemberModel member,
-    bool isDark,
   ) {
     final warningColor = _warningColor(member.warningLevel);
     final warningLabel = _warningLabel(
@@ -391,9 +377,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.6)
-                      : AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -403,11 +387,11 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
           // Plan name
           Text(
             member.planLabel,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Poppins',
               fontSize: 28,
               fontWeight: FontWeight.w700,
-              color: isDark ? Colors.white : AppColors.dark,
+              color: Colors.white,
             ),
           ),
 
@@ -421,9 +405,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 13,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.6)
-                  : AppColors.textSecondary,
+              color: Colors.white.withValues(alpha: 0.6),
             ),
           ),
 
@@ -435,9 +417,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
             child: LinearProgressIndicator(
               value: _progressValue(member),
               minHeight: 6,
-              backgroundColor: isDark
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : Colors.black.withValues(alpha: 0.06),
+              backgroundColor: Colors.white.withValues(alpha: 0.1),
               valueColor: AlwaysStoppedAnimation<Color>(warningColor),
             ),
           ),
@@ -454,9 +434,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 11,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.5)
-                      : AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
               ),
               const Spacer(),
@@ -467,9 +445,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 11,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.5)
-                      : AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
               ),
             ],

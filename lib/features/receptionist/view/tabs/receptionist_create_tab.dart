@@ -89,27 +89,31 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
+          backgroundColor: const Color(0xFF151A1A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Colors.white.withValues(alpha: 0.12),
+            ),
           ),
           title: const Text(
             'Member Created ✓',
             style: TextStyle(
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
-              color: AppColors.dark,
+              color: Colors.white,
             ),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Share these credentials with the member:',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 12),
@@ -117,8 +121,11 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.background,
+                  color: Colors.white.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.12),
+                  ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +136,7 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                         fontFamily: 'Poppins',
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.dark,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -139,7 +146,7 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                         fontFamily: 'Poppins',
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.dark,
+                        color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -149,7 +156,7 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                         fontFamily: 'Poppins',
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.dark,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -165,7 +172,7 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: AppColors.primary,
                 ),
               ),
             ),
@@ -194,25 +201,47 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
       style: const TextStyle(
         fontFamily: 'Poppins',
         fontSize: 14,
-        color: AppColors.dark,
+        color: Colors.white,
       ),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 14,
+          color: Colors.white.withValues(alpha: 0.6),
+        ),
         hintText: hint,
-        prefixIcon: Icon(icon),
+        hintStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 14,
+          color: Colors.white.withValues(alpha: 0.5),
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: Colors.white.withValues(alpha: 0.6),
+        ),
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: Colors.white.withValues(alpha: 0.06),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(
+            color: Colors.white.withValues(alpha: 0.12),
+            width: 1,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(
+            color: Colors.white.withValues(alpha: 0.12),
+            width: 1,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(
+            color: AppColors.primary,
+            width: 1,
+          ),
         ),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,
@@ -230,20 +259,37 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
   }) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(icon),
+      labelStyle: TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: 14,
+        color: Colors.white.withValues(alpha: 0.6),
+      ),
+      prefixIcon: Icon(
+        icon,
+        color: Colors.white.withValues(alpha: 0.6),
+      ),
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: Colors.white.withValues(alpha: 0.06),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(
+          color: Colors.white.withValues(alpha: 0.12),
+          width: 1,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(
+          color: Colors.white.withValues(alpha: 0.12),
+          width: 1,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
+        borderSide: const BorderSide(
+          color: AppColors.primary,
+          width: 1,
+        ),
       ),
       contentPadding: const EdgeInsets.symmetric(
         vertical: 16,
@@ -262,8 +308,11 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.surface,
+          color: selected ? AppColors.primary : Colors.white.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? AppColors.primary : Colors.white.withValues(alpha: 0.12),
+          ),
         ),
         alignment: Alignment.center,
         child: Text(
@@ -272,7 +321,7 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
             fontFamily: 'Poppins',
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: selected ? AppColors.dark : AppColors.textSecondary,
+            color: selected ? AppColors.dark : Colors.white.withValues(alpha: 0.6),
           ),
         ),
       ),
@@ -284,10 +333,10 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
     final viewModel = context.watch<MemberViewModel>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Form(
             key: _formKey,
             child: Column(
@@ -300,17 +349,17 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                     fontFamily: 'Poppins',
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.dark,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Create an account for a new gym member.',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -366,35 +415,58 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                   style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
-                    color: AppColors.dark,
+                    color: Colors.white,
                   ),
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
                     hintText: 'Min 6 characters',
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    hintStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: 0.5),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                       onPressed: () => setState(
                         () => _obscurePassword = !_obscurePassword,
                       ),
                     ),
                     filled: true,
-                    fillColor: AppColors.surface,
+                    fillColor: Colors.white.withValues(alpha: 0.06),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        width: 1,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        width: 1,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(
+                        color: AppColors.primary,
+                        width: 1,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 16,
@@ -412,18 +484,26 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                 // ── Gender Dropdown ──
                 DropdownButtonFormField<String>(
                   initialValue: _selectedGender,
+                  dropdownColor: const Color(0xFF1E2424),
+                  iconEnabledColor: Colors.white.withValues(alpha: 0.6),
                   style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
-                    color: AppColors.dark,
+                    color: Colors.white,
                   ),
                   decoration: _dropdownDecoration(
                     label: 'Gender',
                     icon: Icons.person_outline,
                   ),
                   items: const [
-                    DropdownMenuItem(value: 'male', child: Text('Male')),
-                    DropdownMenuItem(value: 'female', child: Text('Female')),
+                    DropdownMenuItem(
+                      value: 'male',
+                      child: Text('Male', style: TextStyle(color: Colors.white)),
+                    ),
+                    DropdownMenuItem(
+                      value: 'female',
+                      child: Text('Female', style: TextStyle(color: Colors.white)),
+                    ),
                   ],
                   onChanged: (v) => setState(() => _selectedGender = v!),
                 ),
@@ -446,7 +526,7 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                     fontFamily: 'Poppins',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.dark,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -454,32 +534,43 @@ class _ReceptionistCreateTabState extends State<ReceptionistCreateTab> {
                 // ── Plan Dropdown ──
                 DropdownButtonFormField<String>(
                   initialValue: _selectedPlan,
+                  dropdownColor: const Color(0xFF1E2424),
+                  iconEnabledColor: Colors.white.withValues(alpha: 0.6),
                   style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
-                    color: AppColors.dark,
+                    color: Colors.white,
                   ),
                   decoration: _dropdownDecoration(
                     label: 'Plan',
                     icon: Icons.card_membership,
                   ),
                   items: const [
-                    DropdownMenuItem(value: 'basic', child: Text('Basic')),
-                    DropdownMenuItem(value: 'premium', child: Text('Premium')),
-                    DropdownMenuItem(value: 'gold', child: Text('Gold')),
+                    DropdownMenuItem(
+                      value: 'basic',
+                      child: Text('Basic', style: TextStyle(color: Colors.white)),
+                    ),
+                    DropdownMenuItem(
+                      value: 'premium',
+                      child: Text('Premium', style: TextStyle(color: Colors.white)),
+                    ),
+                    DropdownMenuItem(
+                      value: 'gold',
+                      child: Text('Gold', style: TextStyle(color: Colors.white)),
+                    ),
                   ],
                   onChanged: (v) => setState(() => _selectedPlan = v!),
                 ),
                 const SizedBox(height: 16),
 
                 // ── Duration Segmented ──
-                const Text(
+                Text(
                   'Duration',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
                 const SizedBox(height: 8),

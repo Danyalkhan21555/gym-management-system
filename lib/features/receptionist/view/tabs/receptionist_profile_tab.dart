@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../authentication/view/change_password_screen.dart';
 
 class ReceptionistProfileTab extends StatelessWidget {
@@ -20,10 +21,10 @@ class ReceptionistProfileTab extends StatelessWidget {
     final status = profile?.status ?? 'active';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -47,7 +48,7 @@ class ReceptionistProfileTab extends StatelessWidget {
                             fontFamily: 'Poppins',
                             fontSize: 32,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.dark,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -60,7 +61,7 @@ class ReceptionistProfileTab extends StatelessWidget {
                         fontFamily: 'Poppins',
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.dark,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -70,19 +71,9 @@ class ReceptionistProfileTab extends StatelessWidget {
               const SizedBox(height: 32),
 
               // ── Account Info Card ──
-              Container(
+              GlassCard(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+                borderRadius: 20,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -104,19 +95,9 @@ class ReceptionistProfileTab extends StatelessWidget {
               const SizedBox(height: 16),
 
               // ── App Info Card ──
-              Container(
+              GlassCard(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+                borderRadius: 20,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -127,11 +108,12 @@ class ReceptionistProfileTab extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
               const SizedBox(height: 16),
 
               // ── Change Password Card ──
-              InkWell(
+              GlassCard(
+                padding: const EdgeInsets.all(20),
+                borderRadius: 20,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -140,68 +122,53 @@ class ReceptionistProfileTab extends StatelessWidget {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.lock_outline,
-                          size: 22,
-                          color: AppColors.primary,
-                        ),
+                      child: const Icon(
+                        Icons.lock_outline,
+                        size: 22,
+                        color: AppColors.primary,
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Change Password',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.dark,
-                              ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Change Password',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
-                            const SizedBox(height: 2),
-                            const Text(
-                              'Update your account password',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Update your account password',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      const Icon(
-                        Icons.chevron_right,
-                        size: 20,
-                        color: AppColors.textSecondary,
-                      ),
-                    ],
-                  ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 20,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  ],
                 ),
               ),
 
@@ -240,14 +207,14 @@ class ReceptionistProfileTab extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ── Footer ──
-              const Center(
+              Center(
                 child: Text(
                   'Made with ❤️ by dbaCoders',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -266,11 +233,11 @@ class ReceptionistProfileTab extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: Colors.white.withValues(alpha: 0.6),
           ),
         ),
         const Spacer(),
@@ -280,7 +247,7 @@ class ReceptionistProfileTab extends StatelessWidget {
             fontFamily: 'Poppins',
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.dark,
+            color: Colors.white,
           ),
         ),
       ],
@@ -294,7 +261,7 @@ class ReceptionistProfileTab extends StatelessWidget {
       child: Divider(
         height: 1,
         thickness: 0.5,
-        color: Colors.black.withValues(alpha: 0.06),
+        color: Colors.white.withValues(alpha: 0.08),
       ),
     );
   }

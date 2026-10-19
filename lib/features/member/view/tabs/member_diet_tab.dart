@@ -62,7 +62,6 @@ class _MemberDietTabState extends State<MemberDietTab> {
   @override
   Widget build(BuildContext context) {
     final planVm = context.watch<DietPlanViewModel>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final plan = planVm.currentPlan;
 
     return Scaffold(
@@ -79,11 +78,11 @@ class _MemberDietTabState extends State<MemberDietTab> {
                 children: [
                   Text(
                     'Diet Plan',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : AppColors.dark,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -92,9 +91,7 @@ class _MemberDietTabState extends State<MemberDietTab> {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.6)
-                          : AppColors.textSecondary,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -110,8 +107,8 @@ class _MemberDietTabState extends State<MemberDietTab> {
                       ),
                     )
                   : plan == null
-                  ? _buildEmpty(context, isDark, planVm)
-                  : _buildPlanView(context, plan, isDark),
+                  ? _buildEmpty(context, planVm)
+                  : _buildPlanView(context, plan),
             ),
           ],
         ),
@@ -122,7 +119,6 @@ class _MemberDietTabState extends State<MemberDietTab> {
   // ── Empty State ──
   Widget _buildEmpty(
     BuildContext context,
-    bool isDark,
     DietPlanViewModel planVm,
   ) {
     return SingleChildScrollView(
@@ -141,17 +137,17 @@ class _MemberDietTabState extends State<MemberDietTab> {
               child: Icon(
                 Icons.restaurant_menu,
                 size: 32,
-                color: isDark ? AppColors.primary : AppColors.dark,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 20),
             Text(
               'No diet plan yet',
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.dark,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 8),
@@ -161,9 +157,7 @@ class _MemberDietTabState extends State<MemberDietTab> {
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 13,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.6)
-                    : AppColors.textSecondary,
+                color: Colors.white.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),
@@ -180,9 +174,9 @@ class _MemberDietTabState extends State<MemberDietTab> {
                 ),
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: isDark ? AppColors.primary : AppColors.dark,
-                side: BorderSide(
-                  color: isDark ? AppColors.primary : AppColors.dark,
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(
+                  color: AppColors.primary,
                   width: 1.5,
                 ),
                 padding: const EdgeInsets.symmetric(
@@ -201,9 +195,9 @@ class _MemberDietTabState extends State<MemberDietTab> {
   }
 
   // ── Plan View ──
-  Widget _buildPlanView(BuildContext context, DietPlanModel plan, bool isDark) {
+  Widget _buildPlanView(BuildContext context, DietPlanModel plan) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -222,7 +216,7 @@ class _MemberDietTabState extends State<MemberDietTab> {
                   child: Icon(
                     Icons.person_outline,
                     size: 20,
-                    color: isDark ? AppColors.primary : AppColors.dark,
+                    color: AppColors.primary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -232,11 +226,11 @@ class _MemberDietTabState extends State<MemberDietTab> {
                     children: [
                       Text(
                         'By ${plan.trainerName}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : AppColors.dark,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -245,9 +239,7 @@ class _MemberDietTabState extends State<MemberDietTab> {
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.6)
-                              : AppColors.textSecondary,
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -275,11 +267,11 @@ class _MemberDietTabState extends State<MemberDietTab> {
                     const SizedBox(width: 8),
                     Text(
                       'Your Plan',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.white : AppColors.dark,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -288,18 +280,16 @@ class _MemberDietTabState extends State<MemberDietTab> {
                 Divider(
                   height: 1,
                   thickness: 0.5,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.06),
+                  color: Colors.white.withValues(alpha: 0.1),
                 ),
                 const SizedBox(height: 16),
                 SelectableText(
                   plan.content,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
                     height: 1.7,
-                    color: isDark ? Colors.white : AppColors.dark,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -325,17 +315,17 @@ class _MemberDietTabState extends State<MemberDietTab> {
                 Icon(
                   Icons.info_outline,
                   size: 18,
-                  color: isDark ? AppColors.primary : AppColors.dark,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Follow this plan consistently. Contact your trainer via chat for any changes.',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 12,
                       height: 1.5,
-                      color: isDark ? AppColors.primary : AppColors.dark,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),

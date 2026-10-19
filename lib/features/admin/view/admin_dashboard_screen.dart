@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/glass_background.dart';
+import '../../../shared/widgets/glass_bottom_nav.dart';
 import '../../announcements/repository/announcement_repository.dart';
 import '../../announcements/viewmodel/announcement_viewmodel.dart';
 import '../../member/repository/member_repository.dart';
@@ -26,19 +26,6 @@ class AdminDashboardScreen extends StatefulWidget {
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _tabs = const [
-    AdminHomeTab(),
-    AdminStaffTab(),
-    AdminMembersTab(),
-    AdminProfileTab(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -56,53 +43,41 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           create: (_) => DashboardStatsViewModel(DashboardStatsRepository()),
         ),
       ],
-      child: Scaffold(
-        body: _tabs[_selectedIndex],
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: AppColors.dark,
-            border: Border(
-              top: BorderSide(
-                color: Colors.white.withValues(alpha: 0.06),
-                width: 1.0,
-              ),
-            ),
+      child: GlassBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          extendBody: true,
+          body: IndexedStack(
+            index: _selectedIndex,
+            children: const [
+              RepaintBoundary(child: AdminHomeTab()),
+              RepaintBoundary(child: AdminStaffTab()),
+              RepaintBoundary(child: AdminMembersTab()),
+              RepaintBoundary(child: AdminProfileTab()),
+            ],
           ),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            type: BottomNavigationBarType.fixed,
-            elevation: 0,
+          bottomNavigationBar: GlassBottomNav(
             currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: const Color(0xFF7A7A7A),
-            selectedLabelStyle: GoogleFonts.poppins(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: GoogleFonts.poppins(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
+            onTap: (index) => setState(() => _selectedIndex = index),
             items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
+              GlassNavItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
                 label: 'Home',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.badge_outlined),
-                activeIcon: Icon(Icons.badge),
+              GlassNavItem(
+                icon: Icons.badge_outlined,
+                activeIcon: Icons.badge,
                 label: 'Staff',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.people_outline),
-                activeIcon: Icon(Icons.people),
+              GlassNavItem(
+                icon: Icons.people_outline,
+                activeIcon: Icons.people,
                 label: 'Members',
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
+              GlassNavItem(
+                icon: Icons.person_outline,
+                activeIcon: Icons.person,
                 label: 'Profile',
               ),
             ],

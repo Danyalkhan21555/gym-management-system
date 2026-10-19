@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../chat/repository/chat_repository.dart';
 import '../../../chat/view/chat_screen.dart';
 import '../../../staff/model/staff_model.dart';
@@ -31,7 +32,6 @@ class _MemberChatTabState extends State<MemberChatTab> {
   Widget build(BuildContext context) {
     final authVm = AuthProvider.of(context);
     final staffVm = context.watch<StaffViewModel>();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Filter to active trainers only
     final trainers = staffVm.staff
@@ -50,13 +50,13 @@ class _MemberChatTabState extends State<MemberChatTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Chat',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? Colors.white : AppColors.dark,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -65,9 +65,7 @@ class _MemberChatTabState extends State<MemberChatTab> {
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.6)
-                          : AppColors.textSecondary,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -83,11 +81,11 @@ class _MemberChatTabState extends State<MemberChatTab> {
                       ),
                     )
                   : trainers.isEmpty
-                      ? _buildEmpty(context)
+                      ? _buildEmpty()
                       : ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
                           itemCount: trainers.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final trainer = trainers[index];
@@ -104,44 +102,41 @@ class _MemberChatTabState extends State<MemberChatTab> {
     );
   }
 
-  Widget _buildEmpty(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildEmpty() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.chat_bubble_outline,
-              size: 48,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.4)
-                  : AppColors.textSecondary,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'No trainers available',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : AppColors.dark,
+        child: GlassCard(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.chat_bubble_outline,
+                size: 48,
+                color: Colors.white.withValues(alpha: 0.4),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Trainers will appear here once added by the admin.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 13,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.6)
-                    : AppColors.textSecondary,
+              const SizedBox(height: 12),
+              const Text(
+                'No trainers available',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                'Trainers will appear here once added by the admin.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 13,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -196,99 +191,68 @@ class _TrainerChatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.06)
-            : AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.04),
-          width: 1,
-        ),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Avatar
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      borderRadius: 20,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            // Avatar
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  trainer.name.isNotEmpty
+                      ? trainer.name[0].toUpperCase()
+                      : '?',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
                   ),
-                  child: Center(
-                    child: Text(
-                      trainer.name.isNotEmpty
-                          ? trainer.name[0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.primary : AppColors.dark,
-                      ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    trainer.name,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        trainer.name,
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white : AppColors.dark,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Trainer • ${trainer.profileId}',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.6)
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 2),
+                  Text(
+                    'Trainer • ${trainer.profileId}',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
                   ),
-                ),
-                Icon(
-                  Icons.chat_bubble_outline,
-                  size: 20,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.6)
-                      : AppColors.textSecondary,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 20,
+              color: Colors.white.withValues(alpha: 0.6),
+            ),
+          ],
         ),
       ),
     );

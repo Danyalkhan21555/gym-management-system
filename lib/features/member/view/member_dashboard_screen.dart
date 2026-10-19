@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/glass_background.dart';
+import '../../../shared/widgets/glass_bottom_nav.dart';
 import '../../admin/repository/dashboard_stats_repository.dart';
 import '../../admin/viewmodel/dashboard_stats_viewmodel.dart';
 import '../../announcements/repository/announcement_repository.dart';
@@ -113,110 +114,42 @@ class _MemberDashboardContentState extends State<_MemberDashboardContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: IndexedStack(
-        index: widget.selectedIndex,
-        children: const [
-          MemberHomeTab(),
-          MemberDietTab(),
-          MemberChatTab(),
-          MemberProfileTab(),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
+    return GlassBackground(
+      child: Scaffold(
+        extendBody: true,
+        backgroundColor: Colors.transparent,
+        body: IndexedStack(
+          index: widget.selectedIndex,
+          children: const [
+            RepaintBoundary(child: MemberHomeTab()),
+            RepaintBoundary(child: MemberDietTab()),
+            RepaintBoundary(child: MemberChatTab()),
+            RepaintBoundary(child: MemberProfileTab()),
           ],
         ),
-        child: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              children: [
-                _buildNavItem(
-                  context,
-                  0,
-                  'Home',
-                  Icons.home,
-                  Icons.home_outlined,
-                ),
-                _buildNavItem(
-                  context,
-                  1,
-                  'Diet',
-                  Icons.restaurant,
-                  Icons.restaurant_outlined,
-                ),
-                _buildNavItem(
-                  context,
-                  2,
-                  'Chat',
-                  Icons.chat_bubble,
-                  Icons.chat_bubble_outline,
-                ),
-                _buildNavItem(
-                  context,
-                  3,
-                  'Profile',
-                  Icons.person,
-                  Icons.person_outline,
-                ),
-              ],
+        bottomNavigationBar: GlassBottomNav(
+          currentIndex: widget.selectedIndex,
+          onTap: widget.onTabTapped,
+          items: const [
+            GlassNavItem(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home,
+              label: 'Home',
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(
-    BuildContext context,
-    int index,
-    String label,
-    IconData activeIcon,
-    IconData inactiveIcon,
-  ) {
-    final isSelected = widget.selectedIndex == index;
-
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => widget.onTabTapped(index),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? activeIcon : inactiveIcon,
-              size: 24,
-              color: isSelected ? AppColors.dark : AppColors.textSecondary,
+            GlassNavItem(
+              icon: Icons.restaurant_outlined,
+              activeIcon: Icons.restaurant,
+              label: 'Diet',
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppColors.dark : AppColors.textSecondary,
-              ),
+            GlassNavItem(
+              icon: Icons.chat_bubble_outline,
+              activeIcon: Icons.chat_bubble,
+              label: 'Chat',
             ),
-            const SizedBox(height: 3),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.transparent,
-                shape: BoxShape.circle,
-              ),
+            GlassNavItem(
+              icon: Icons.person_outline,
+              activeIcon: Icons.person,
+              label: 'Profile',
             ),
           ],
         ),

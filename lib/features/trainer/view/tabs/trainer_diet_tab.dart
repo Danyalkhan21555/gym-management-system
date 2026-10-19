@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../dietPlan/viewmodel/diet_plan_viewmodel.dart';
 import '../../../member/viewModel/view_model.dart';
 
@@ -129,10 +130,10 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
         .toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Form(
             key: _formKey,
             child: Column(
@@ -145,17 +146,17 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
                     fontFamily: 'Poppins',
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.dark,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Write or update a member\'s diet plan.',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
 
@@ -163,60 +164,47 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
 
                 // ── Member Dropdown ──
                 if (memberVm.isLoading)
-                  Container(
+                  GlassCard(
                     height: 60,
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    alignment: Alignment.center,
-                    child: const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: AppColors.primary,
+                    padding: EdgeInsets.zero,
+                    child: const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   )
                 else if (activeMembers.isEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Column(
+                  GlassCard(
+                    width: double.infinity,
+                    child: Column(
                       children: [
                         Icon(
                           Icons.people_outline,
                           size: 32,
-                          color: AppColors.textSecondary,
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
-                        SizedBox(height: 8),
-                        Text(
+                        const SizedBox(height: 8),
+                        const Text(
                           'No active members',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.dark,
+                            color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           'Add members from the receptionist dashboard first.',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: Colors.white.withValues(alpha: 0.6),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -230,26 +218,42 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
                       fontFamily: 'Poppins',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.dark,
+                      color: Colors.white,
                     ),
-                    dropdownColor: AppColors.surface,
+                    dropdownColor: const Color(0xFF1A2A1A),
                     borderRadius: BorderRadius.circular(16),
+                    iconEnabledColor: Colors.white.withValues(alpha: 0.6),
                     decoration: InputDecoration(
                       labelText: 'Select Member',
-                      labelStyle: const TextStyle(
+                      labelStyle: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.person_outline,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                       filled: true,
-                      fillColor: AppColors.surface,
+                      fillColor: Colors.white.withValues(alpha: 0.06),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.12),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.12),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 16,
@@ -260,7 +264,10 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
                         .map(
                           (m) => DropdownMenuItem(
                             value: m.uid,
-                            child: Text('${m.name} (${m.memberId})'),
+                            child: Text(
+                              '${m.name} (${m.memberId})',
+                              style: const TextStyle(color: Colors.white),
+                            ),
                           ),
                         )
                         .toList(),
@@ -272,19 +279,17 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
                 // ── Diet Plan Text Field (only if member selected) ──
                 if (_selectedMemberId != null) ...[
                   if (planVm.isLoading)
-                    Container(
+                    GlassCard(
                       height: 200,
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      alignment: Alignment.center,
-                      child: const SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: AppColors.primary,
+                      padding: EdgeInsets.zero,
+                      child: const Center(
+                        child: SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     )
@@ -296,7 +301,7 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
                       style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 14,
-                        color: AppColors.dark,
+                        color: Colors.white,
                       ),
                       decoration: InputDecoration(
                         hintText:
@@ -306,13 +311,28 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
                         hintStyle: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 13,
-                          color: AppColors.textSecondary.withValues(alpha: 0.6),
+                          color: Colors.white.withValues(alpha: 0.5),
                         ),
                         filled: true,
-                        fillColor: AppColors.surface,
+                        fillColor: Colors.white.withValues(alpha: 0.06),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
                         ),
                         contentPadding: const EdgeInsets.all(16),
                       ),
@@ -330,10 +350,10 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
                     Text(
                       'Last updated: ${_formatDate(planVm.currentPlan!.updatedAt)} '
                       'by ${planVm.currentPlan!.trainerName}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                     ),
                   const SizedBox(height: 20),

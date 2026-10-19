@@ -26,10 +26,10 @@ class MemberProfileTab extends StatelessWidget {
     final status = profile?.status ?? 'active';
 
     return Scaffold(
-      backgroundColor: AppColors.bgOf(context),
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -66,11 +66,11 @@ class MemberProfileTab extends StatelessWidget {
                     Text(
                       name,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimaryOf(context),
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -162,11 +162,11 @@ class MemberProfileTab extends StatelessWidget {
                         children: [
                           Text(
                             'Edit Profile',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimaryOf(context),
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -175,7 +175,7 @@ class MemberProfileTab extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 12,
-                              color: AppColors.textSecondaryOf(context),
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -184,7 +184,7 @@ class MemberProfileTab extends StatelessWidget {
                     Icon(
                       Icons.chevron_right,
                       size: 20,
-                      color: AppColors.textSecondaryOf(context),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ],
                 ),
@@ -225,11 +225,11 @@ class MemberProfileTab extends StatelessWidget {
                         children: [
                           Text(
                             'Change Password',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimaryOf(context),
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -238,7 +238,7 @@ class MemberProfileTab extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 12,
-                              color: AppColors.textSecondaryOf(context),
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
                           ),
                         ],
@@ -247,7 +247,7 @@ class MemberProfileTab extends StatelessWidget {
                     Icon(
                       Icons.chevron_right,
                       size: 20,
-                      color: AppColors.textSecondaryOf(context),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ],
                 ),
@@ -295,7 +295,7 @@ class MemberProfileTab extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondaryOf(context),
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -318,17 +318,17 @@ class MemberProfileTab extends StatelessWidget {
             fontFamily: 'Poppins',
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondaryOf(context),
+            color: Colors.white.withValues(alpha: 0.6),
           ),
         ),
         const Spacer(),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryOf(context),
+            color: Colors.white,
           ),
         ),
       ],
@@ -337,15 +337,12 @@ class MemberProfileTab extends StatelessWidget {
 
   // ── Helper: thin divider between rows ──
   Widget _buildDivider(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14),
       child: Divider(
         height: 1,
         thickness: 0.5,
-        color: isDark
-            ? AppColors.darkDivider
-            : Colors.black.withValues(alpha: 0.06),
+        color: Colors.white.withValues(alpha: 0.1),
       ),
     );
   }

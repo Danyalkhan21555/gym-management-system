@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../../authentication/view/change_password_screen.dart';
 
 class TrainerProfileTab extends StatelessWidget {
@@ -19,10 +20,10 @@ class TrainerProfileTab extends StatelessWidget {
     final status = profile?.status ?? 'active';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -46,7 +47,7 @@ class TrainerProfileTab extends StatelessWidget {
                             fontFamily: 'Poppins',
                             fontSize: 32,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.dark,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -59,7 +60,7 @@ class TrainerProfileTab extends StatelessWidget {
                         fontFamily: 'Poppins',
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.dark,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -69,19 +70,7 @@ class TrainerProfileTab extends StatelessWidget {
               const SizedBox(height: 32),
 
               // ── Account Info Card ──
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+              GlassCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -103,19 +92,7 @@ class TrainerProfileTab extends StatelessWidget {
               const SizedBox(height: 16),
 
               // ── App Info Card ──
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+              GlassCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -126,11 +103,11 @@ class TrainerProfileTab extends StatelessWidget {
                 ),
               ),
 
-              
               const SizedBox(height: 16),
 
               // ── Change Password Card ──
-              InkWell(
+              GlassCard(
+                padding: EdgeInsets.zero,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -139,20 +116,8 @@ class TrainerProfileTab extends StatelessWidget {
                     ),
                   );
                 },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
+                child: Padding(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
                   child: Row(
                     children: [
                       Container(
@@ -179,25 +144,25 @@ class TrainerProfileTab extends StatelessWidget {
                                 fontFamily: 'Poppins',
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.dark,
+                                color: Colors.white,
                               ),
                             ),
                             const SizedBox(height: 2),
-                            const Text(
+                            Text(
                               'Update your account password',
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: Colors.white.withValues(alpha: 0.6),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.chevron_right,
                         size: 20,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                     ],
                   ),
@@ -239,14 +204,14 @@ class TrainerProfileTab extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ── Footer ──
-              const Center(
+              Center(
                 child: Text(
                   'Made with ❤️ by dbaCoders',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -265,11 +230,11 @@ class TrainerProfileTab extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: Colors.white.withValues(alpha: 0.6),
           ),
         ),
         const Spacer(),
@@ -279,7 +244,7 @@ class TrainerProfileTab extends StatelessWidget {
             fontFamily: 'Poppins',
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.dark,
+            color: Colors.white,
           ),
         ),
       ],
@@ -293,7 +258,7 @@ class TrainerProfileTab extends StatelessWidget {
       child: Divider(
         height: 1,
         thickness: 0.5,
-        color: Colors.black.withValues(alpha: 0.06),
+        color: Colors.white.withValues(alpha: 0.1),
       ),
     );
   }

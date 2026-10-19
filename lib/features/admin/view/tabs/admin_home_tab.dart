@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../../viewmodel/dashboard_stats_viewmodel.dart';
 import '../widgets/admin_announcement_card.dart';
 import '../widgets/admin_stat_card.dart';
@@ -89,10 +90,10 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
     final stats = statsVm.stats;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -103,17 +104,17 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
                   fontFamily: 'Poppins',
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark, // #151A1A
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'Welcome back',
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
-                  color: AppColors.textSecondary, // #7A7A7A
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
 
@@ -174,7 +175,7 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
                       fontFamily: 'Poppins',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.dark, // #151A1A
+                      color: Colors.white,
                     ),
                   ),
                   const Spacer(),
@@ -205,20 +206,11 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
 
               // ── Announcement section ──
               if (viewModel.isLoading)
-                Container(
+                const GlassCard(
                   height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
+                  width: double.infinity,
+                  borderRadius: 20,
+                  child: Center(
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
                 )
@@ -228,19 +220,16 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
                   dateLabel: _formatDate(viewModel.announcement!.updatedAt),
                 )
               else
-                Container(
+                GlassCard(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
+                  borderRadius: 20,
                   child: Column(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.campaign_outlined,
                         size: 32,
-                        color: AppColors.textSecondary,
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                       const SizedBox(height: 8),
                       const Text(
@@ -250,18 +239,18 @@ class _AdminHomeTabState extends State<AdminHomeTab> {
                           fontFamily: 'Poppins',
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.dark,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
+                      Text(
                         'Tap "Add Announcement" below to create one.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
-                          color: AppColors.textSecondary,
+                          color: Colors.white.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 16),

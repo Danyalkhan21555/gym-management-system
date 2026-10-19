@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_background.dart';
 import '../model/message_model.dart';
 import '../repository/chat_repository.dart';
 import '../viewmodel/chat_viewmodel.dart';
@@ -207,161 +208,163 @@ class _ChatScreenContentState extends State<_ChatScreenContent> {
     final authVm = AuthProvider.of(context);
     final currentUserId = authVm.userProfile?.uid ?? '';
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        foregroundColor: AppColors.dark,
-        title: Row(
-          children: [
-            // Avatar with first letter
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  widget.otherUserName.isNotEmpty
-                      ? widget.otherUserName[0].toUpperCase()
-                      : '?',
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.dark,
+    return GlassBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: Colors.white,
+          title: Row(
+            children: [
+              // Avatar with first letter
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    widget.otherUserName.isNotEmpty
+                        ? widget.otherUserName[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.otherUserName,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.dark,
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.otherUserName,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                Text(
-                  widget.otherUserRole,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 11,
-                    color: AppColors.textSecondary,
+                  Text(
+                    widget.otherUserRole,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 11,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onSelected: (value) {
+                if (value == 'clear') {
+                  _confirmClearChat(context, chatVm);
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'clear',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_outline,
+                        size: 18,
+                        color: AppColors.error,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        'Clear Chat',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ],
         ),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              if (value == 'clear') {
-                _confirmClearChat(context, chatVm);
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'clear',
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.delete_outline,
-                      size: 18,
-                      color: AppColors.error,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      'Clear Chat',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        color: AppColors.error,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // ── Messages Area ──
+              Expanded(
+                child: chatVm.isLoadingMessages
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : chatVm.messages.isEmpty
+                    ? _buildEmptyState()
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        itemCount: chatVm.messages.length,
+                        itemBuilder: (context, index) {
+                          final message = chatVm.messages[index];
+                          final isMine = message.senderId == currentUserId;
+                          return _MessageBubble(message: message, isMine: isMine);
+                        },
                       ),
-                    ),
-                  ],
-                ),
               ),
+
+              // ── Input Area ──
+              _buildInputArea(chatVm, currentUserId),
             ],
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Messages Area ──
-            Expanded(
-              child: chatVm.isLoadingMessages
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    )
-                  : chatVm.messages.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      itemCount: chatVm.messages.length,
-                      itemBuilder: (context, index) {
-                        final message = chatVm.messages[index];
-                        final isMine = message.senderId == currentUserId;
-                        return _MessageBubble(message: message, isMine: isMine);
-                      },
-                    ),
-            ),
-
-            // ── Input Area ──
-            _buildInputArea(chatVm, currentUserId),
-          ],
         ),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.chat_bubble_outline,
               size: 48,
-              color: AppColors.textSecondary,
+              color: Colors.white.withValues(alpha: 0.4),
             ),
-            SizedBox(height: 12),
-            Text(
+            const SizedBox(height: 12),
+            const Text(
               'No messages yet',
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppColors.dark,
+                color: Colors.white,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
               'Send the first message to start the conversation.',
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: Colors.white.withValues(alpha: 0.5),
               ),
               textAlign: TextAlign.center,
             ),
@@ -375,11 +378,11 @@ class _ChatScreenContentState extends State<_ChatScreenContent> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Colors.white.withValues(alpha: 0.06),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
             offset: const Offset(0, -4),
           ),
         ],
@@ -395,17 +398,17 @@ class _ChatScreenContentState extends State<_ChatScreenContent> {
               style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 14,
-                color: AppColors.dark,
+                color: Colors.white,
               ),
               decoration: InputDecoration(
                 hintText: 'Type a message...',
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 14,
-                  color: AppColors.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: Colors.white.withValues(alpha: 0.06),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
@@ -447,7 +450,7 @@ class _ChatScreenContentState extends State<_ChatScreenContent> {
   }
 }
 
-/// Message bubble rendering sent (right, primary) and received (left, surface) messages.
+/// Message bubble rendering sent (right, primary) and received (left, glass) messages.
 class _MessageBubble extends StatelessWidget {
   final MessageModel message;
   final bool isMine;
@@ -467,55 +470,55 @@ class _MessageBubble extends StatelessWidget {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isMine ? AppColors.primary : AppColors.surface,
+          color: isMine
+              ? AppColors.primary
+              : Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(18),
             topRight: const Radius.circular(18),
             bottomLeft: Radius.circular(isMine ? 18 : 4),
             bottomRight: Radius.circular(isMine ? 4 : 18),
           ),
-          boxShadow: isMine
+          border: isMine
               ? null
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+              : Border.all(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  width: 1,
+                ),
         ),
         child: Column(
-          crossAxisAlignment: isMine
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
+          crossAxisAlignment:
+              isMine ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
             if (!isMine) ...[
               Text(
                 message.senderName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.dark,
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 2),
             ],
             Text(
               message.text,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 14,
-                color: AppColors.dark,
+                color: isMine ? AppColors.dark : Colors.white,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               _formatTime(message.timestamp),
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 10,
-                color: AppColors.textSecondary,
+                color: isMine
+                    ? AppColors.dark.withValues(alpha: 0.6)
+                    : Colors.white.withValues(alpha: 0.5),
               ),
             ),
           ],

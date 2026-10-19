@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/glass_background.dart';
+import '../../../shared/widgets/glass_bottom_nav.dart';
 import '../../admin/repository/dashboard_stats_repository.dart';
 import '../../admin/viewmodel/dashboard_stats_viewmodel.dart';
 import '../../announcements/repository/announcement_repository.dart';
@@ -39,113 +40,53 @@ class _ReceptionistDashboardScreenState
           create: (_) => MemberViewModel(MemberRepository()),
         ),
       ],
-      child: Scaffold(
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: [
-            ReceptionistHomeTab(
-              onAddMemberTap: () => setState(() => _selectedIndex = 2),
-            ),
-            const ReceptionistMembersTab(),
-            const ReceptionistCreateTab(),
-            const ReceptionistProfileTab(),
-          ],
-        ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
+      child: GlassBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          extendBody: true,
+          body: IndexedStack(
+            index: _selectedIndex,
+            children: [
+              RepaintBoundary(
+                child: ReceptionistHomeTab(
+                  onAddMemberTap: () => setState(() => _selectedIndex = 2),
+                ),
+              ),
+              RepaintBoundary(
+                child: ReceptionistMembersTab(
+                  onAddMemberTap: () => setState(() => _selectedIndex = 2),
+                ),
+              ),
+              const RepaintBoundary(child: ReceptionistCreateTab()),
+              const RepaintBoundary(child: ReceptionistProfileTab()),
+            ],
+          ),
+          bottomNavigationBar: GlassBottomNav(
+            currentIndex: _selectedIndex,
+            onTap: (index) => setState(() => _selectedIndex = index),
+            items: const [
+              GlassNavItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home,
+                label: 'Home',
+              ),
+              GlassNavItem(
+                icon: Icons.people_outline,
+                activeIcon: Icons.people,
+                label: 'Members',
+              ),
+              GlassNavItem(
+                icon: Icons.person_add_alt_1_outlined,
+                activeIcon: Icons.person_add_alt_1,
+                label: 'Create',
+              ),
+              GlassNavItem(
+                icon: Icons.person_outline,
+                activeIcon: Icons.person,
+                label: 'Profile',
               ),
             ],
           ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  _buildNavItem(
-                    0,
-                    'Home',
-                    Icons.home,
-                    Icons.home_outlined,
-                  ),
-                  _buildNavItem(
-                    1,
-                    'Members',
-                    Icons.people,
-                    Icons.people_outline,
-                  ),
-                  _buildNavItem(
-                    2,
-                    'Create',
-                    Icons.person_add_alt_1,
-                    Icons.person_add_alt_1_outlined,
-                  ),
-                  _buildNavItem(
-                    3,
-                    'Profile',
-                    Icons.person,
-                    Icons.person_outline,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(
-    int index,
-    String label,
-    IconData activeIcon,
-    IconData inactiveIcon,
-  ) {
-    final isSelected = _selectedIndex == index;
-
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? activeIcon : inactiveIcon,
-              size: 24,
-              color: isSelected ? AppColors.dark : AppColors.textSecondary,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? AppColors.dark : AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 3),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.transparent,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
         ),
       ),
     );
