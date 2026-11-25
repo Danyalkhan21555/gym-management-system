@@ -7,6 +7,7 @@ import '../../../../shared/widgets/glass_card.dart';
 import '../../../staff/model/staff_model.dart';
 import '../../../staff/view/create_staff_screen.dart';
 import '../../../staff/viewmodel/staff_viewmodel.dart';
+import '../staff_detail_screen.dart';
 
 class AdminStaffTab extends StatefulWidget {
   const AdminStaffTab({super.key});
@@ -30,15 +31,18 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openCreateStaff,
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.dark,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 100),
+        child: FloatingActionButton(
+          onPressed: _openCreateStaff,
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.dark,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Icon(Icons.add, size: 26),
         ),
-        child: const Icon(Icons.add, size: 26),
       ),
       body: SafeArea(
         child: Column(
@@ -121,7 +125,16 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
             ),
 
             // ── List area ──────────────────────────────────────────────────
-            Expanded(child: _buildList(viewModel)),
+            Expanded(
+              child: RefreshIndicator(
+                color: AppColors.primary,
+                backgroundColor: AppColors.darkSurface,
+                onRefresh: () async {
+                  await context.read<StaffViewModel>().loadStaff();
+                },
+                child: _buildList(viewModel),
+              ),
+            ),
           ],
         ),
       ),
@@ -152,83 +165,96 @@ class _AdminStaffTabState extends State<AdminStaffTab> {
 
     // Error state
     if (viewModel.errorMessage != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 40,
-                color: Colors.white.withValues(alpha: 0.6),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                viewModel.errorMessage!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () =>
-                    context.read<StaffViewModel>().loadStaff(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: AppColors.dark,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 40,
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
-                ),
-                child: const Text(
-                  'Retry',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                  const SizedBox(height: 12),
+                  Text(
+                    viewModel.errorMessage!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () =>
+                        context.read<StaffViewModel>().loadStaff(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.dark,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Retry',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       );
     }
 
     // Empty state
     if (viewModel.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.campaign_outlined,
-              size: 40,
-              color: Colors.white.withValues(alpha: 0.6),
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.campaign_outlined,
+                  size: 40,
+                  color: Colors.white.withValues(alpha: 0.6),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'No staff found',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            const Text(
-              'No staff found',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
     // Staff list
     return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
       itemCount: viewModel.staff.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
@@ -252,10 +278,24 @@ class _StaffListItem extends StatelessWidget {
     final currentAdminUid = AuthProvider.of(context).userProfile?.uid;
 
     return GlassCard(
-      padding: const EdgeInsets.all(16),
+      useBlur: false,
+      padding: EdgeInsets.zero,
       borderRadius: 20,
-      child: Row(
-        children: [
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => StaffDetailScreen(staff: staff),
+          ),
+        );
+        if (context.mounted) {
+          context.read<StaffViewModel>().loadStaff();
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
           // ── Avatar circle ──
           Container(
             width: 48,
@@ -410,8 +450,9 @@ class _StaffListItem extends StatelessWidget {
             const SizedBox(width: 24), // Keep layout spacing consistent
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   /// Displays confirmation dialog and updates staff status in Firestore.
   Future<void> _confirmStatusChange(

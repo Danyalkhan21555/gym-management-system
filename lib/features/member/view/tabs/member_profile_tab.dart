@@ -81,6 +81,7 @@ class MemberProfileTab extends StatelessWidget {
 
               // ── Account Info Card ──
               GlassCard(
+                useBlur: false,
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,6 +91,14 @@ class MemberProfileTab extends StatelessWidget {
                       'Member ID',
                       profileId.isEmpty ? '—' : profileId,
                     ),
+                    _buildDivider(context),
+                    _buildInfoRow(
+                      context,
+                      'Email',
+                      authVm.currentUser?.email ?? 'N/A',
+                    ),
+                    _buildDivider(context),
+                    _buildInfoRow(context, 'Password', '••••••••'),
                     _buildDivider(context),
                     _buildInfoRow(context, 'Role', _roleLabel(role)),
                     _buildDivider(context),
@@ -106,6 +115,7 @@ class MemberProfileTab extends StatelessWidget {
 
               // ── App Info Card ──
               GlassCard(
+                useBlur: false,
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,6 +131,7 @@ class MemberProfileTab extends StatelessWidget {
 
               // ── Edit Profile Card ──
               GlassCard(
+                useBlur: false,
                 padding: const EdgeInsets.all(20),
                 onTap: () async {
                   final member = memberVm.currentMember;
@@ -194,6 +205,7 @@ class MemberProfileTab extends StatelessWidget {
 
               // ── Change Password Card ──
               GlassCard(
+                useBlur: false,
                 padding: const EdgeInsets.all(20),
                 onTap: () {
                   Navigator.push(
@@ -322,13 +334,16 @@ class MemberProfileTab extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
         ),
       ],

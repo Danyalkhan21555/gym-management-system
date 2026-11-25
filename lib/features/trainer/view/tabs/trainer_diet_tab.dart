@@ -132,9 +132,19 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
-          child: Form(
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          backgroundColor: AppColors.darkSurface,
+          onRefresh: () async {
+            await context.read<MemberViewModel>().loadMembers();
+            if (_selectedMemberId != null) {
+              await _loadMemberPlan(_selectedMemberId!);
+            }
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
+            child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -435,6 +445,7 @@ class _TrainerDietTabState extends State<TrainerDietTab> {
               ],
             ),
           ),
+        ),
         ),
       ),
     );

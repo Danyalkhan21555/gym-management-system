@@ -75,9 +75,19 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
-          child: Column(
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          backgroundColor: AppColors.darkSurface,
+          onRefresh: () async {
+            await Future.wait([
+              context.read<AnnouncementViewModel>().loadAnnouncement(),
+              context.read<DashboardStatsViewModel>().loadStats(),
+            ]);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Greeting ──
@@ -269,6 +279,7 @@ class _ReceptionistHomeTabState extends State<ReceptionistHomeTab> {
                 ),
             ],
           ),
+        ),
         ),
       ),
     );

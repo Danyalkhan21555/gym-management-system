@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/glass_background.dart';
+import '../../../../shared/widgets/glass_card.dart';
 import '../repository/staff_repository.dart';
 import '../viewmodel/staff_viewmodel.dart';
 
@@ -95,233 +97,306 @@ class _CreateStaffContentState extends State<_CreateStaffContent> {
     // Watch so the button and error box rebuild reactively.
     final viewModel = context.watch<StaffViewModel>();
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          'Create Staff',
-          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.w600),
+    return GlassBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text(
+            'Create Staff',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: Colors.white,
         ),
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        foregroundColor: AppColors.dark,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Heading ─────────────────────────────────────────────────
-                const Text(
-                  'Add new staff member',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.dark,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Create an account for a receptionist or trainer. '
-                  'They will receive login credentials.',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // ── Name ────────────────────────────────────────────────────
-                _buildField(
-                  controller: _nameController,
-                  label: 'Full Name',
-                  hint: 'e.g. Ali Khan',
-                  icon: Icons.person_outline,
-                  textCapitalization: TextCapitalization.words,
-                  validator: (v) => v == null || v.trim().length < 2
-                      ? 'Please enter a valid name'
-                      : null,
-                ),
-                const SizedBox(height: 16),
-
-                // ── Email ───────────────────────────────────────────────────
-                _buildField(
-                  controller: _emailController,
-                  label: 'Email',
-                  hint: 'e.g. ali@gym.com',
-                  icon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return 'Please enter an email';
-                    }
-                    if (!v.contains('@')) return 'Enter a valid email';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // ── Password (with visibility toggle) ───────────────────────
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: AppColors.dark,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Min 6 characters',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 16,
-                    ),
-                  ),
-                  validator: (v) {
-                    if (v == null || v.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                    if (v.length < 6) {
-                      return 'Password must be at least 6 chars';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // ── Phone (optional) ────────────────────────────────────────
-                _buildField(
-                  controller: _phoneController,
-                  label: 'Phone (optional)',
-                  hint: 'e.g. 03001234567',
-                  icon: Icons.phone_outlined,
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 16),
-
-                // ── Role dropdown ───────────────────────────────────────────
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedRole,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: AppColors.dark,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Role',
-                    prefixIcon: const Icon(Icons.badge_outlined),
-                    filled: true,
-                    fillColor: AppColors.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 16,
-                    ),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'receptionist',
-                      child: Text('Receptionist'),
-                    ),
-                    DropdownMenuItem(value: 'trainer', child: Text('Trainer')),
-                  ],
-                  onChanged: (v) => setState(() => _selectedRole = v!),
-                ),
-                const SizedBox(height: 24),
-
-                // ── Error box ───────────────────────────────────────────────
-                if (viewModel.createError != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppColors.error.withValues(alpha: 0.5),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: GlassCard(
+              useBlur: false,
+              padding: const EdgeInsets.all(24),
+              borderRadius: 24,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ── Heading ─────────────────────────────────────────────────
+                    const Text(
+                      'Add new staff member',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          color: AppColors.error,
-                          size: 20,
+                    const SizedBox(height: 6),
+                    Text(
+                      'Create an account for a receptionist or trainer. '
+                      'They will receive login credentials.',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // ── Name ────────────────────────────────────────────────────
+                    _buildField(
+                      controller: _nameController,
+                      label: 'Full Name',
+                      hint: 'e.g. Ali Khan',
+                      icon: Icons.person_outline,
+                      textCapitalization: TextCapitalization.words,
+                      validator: (v) => v == null || v.trim().length < 2
+                          ? 'Please enter a valid name'
+                          : null,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // ── Email ───────────────────────────────────────────────────
+                    _buildField(
+                      controller: _emailController,
+                      label: 'Email',
+                      hint: 'e.g. ali@gym.com',
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return 'Please enter an email';
+                        }
+                        if (!v.contains('@')) return 'Enter a valid email';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // ── Password (with visibility toggle) ───────────────────────
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: const TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.white70,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
+                        hintText: 'Min 6 characters',
+                        hintStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          color: Colors.white.withValues(alpha: 0.4),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.lock_outline,
+                          color: Colors.white.withValues(alpha: 0.6),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            color: Colors.white.withValues(alpha: 0.6),
+                          ),
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.06),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return 'Please enter a password';
+                        }
+                        if (v.length < 6) {
+                          return 'Password must be at least 6 chars';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // ── Phone (optional) ────────────────────────────────────────
+                    _buildField(
+                      controller: _phoneController,
+                      label: 'Phone (optional)',
+                      hint: 'e.g. 03001234567',
+                      icon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // ── Role dropdown ───────────────────────────────────────────
+                    DropdownButtonFormField<String>(
+                      initialValue: _selectedRole,
+                      dropdownColor: const Color(0xFF1A2A1A),
+                      iconEnabledColor: Colors.white.withValues(alpha: 0.6),
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: 'Role',
+                        labelStyle: const TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.white70,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.badge_outlined,
+                          color: Colors.white.withValues(alpha: 0.6),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white.withValues(alpha: 0.06),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 16,
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'receptionist',
                           child: Text(
-                            viewModel.createError!,
-                            style: const TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 13,
-                              color: AppColors.error,
-                            ),
+                            'Receptionist',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'trainer',
+                          child: Text(
+                            'Trainer',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ],
+                      onChanged: (v) => setState(() => _selectedRole = v!),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                    const SizedBox(height: 24),
 
-                // ── Submit button ───────────────────────────────────────────
-                SizedBox(
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: viewModel.isCreating ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.dark,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                    // ── Error box ───────────────────────────────────────────────
+                    if (viewModel.createError != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.error.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.error.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: AppColors.error,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                viewModel.createError!,
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 13,
+                                  color: AppColors.error,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // ── Submit button ───────────────────────────────────────────
+                    SizedBox(
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: viewModel.isCreating ? null : _submit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.dark,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: viewModel.isCreating
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: AppColors.dark,
+                                ),
+                              )
+                            : const Text(
+                                'Create Staff',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
-                    child: viewModel.isCreating
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: AppColors.dark,
-                            ),
-                          )
-                        : const Text(
-                            'Create Staff',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -349,17 +424,44 @@ class _CreateStaffContentState extends State<_CreateStaffContent> {
       style: const TextStyle(
         fontFamily: 'Poppins',
         fontSize: 14,
-        color: AppColors.dark,
+        color: Colors.white,
       ),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          color: Colors.white70,
+        ),
         hintText: hint,
-        prefixIcon: Icon(icon),
+        hintStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 14,
+          color: Colors.white.withValues(alpha: 0.4),
+        ),
+        prefixIcon: Icon(
+          icon,
+          color: Colors.white.withValues(alpha: 0.6),
+        ),
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: Colors.white.withValues(alpha: 0.06),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(
+            color: Colors.white.withValues(alpha: 0.12),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: Colors.white.withValues(alpha: 0.12),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(
+            color: AppColors.primary,
+            width: 1.5,
+          ),
         ),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 16,

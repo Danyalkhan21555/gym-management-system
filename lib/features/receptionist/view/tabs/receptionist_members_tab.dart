@@ -140,6 +140,7 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
                   await context.read<MemberViewModel>().loadMembers();
                 },
                 color: AppColors.primary,
+                backgroundColor: AppColors.darkSurface,
                 child: _buildList(context, viewModel),
               ),
             ),
@@ -147,7 +148,7 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
         ),
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 88),
+        padding: const EdgeInsets.only(bottom: 100),
         child: FloatingActionButton(
           onPressed: _openCreateMember,
           backgroundColor: AppColors.primary,
@@ -270,6 +271,7 @@ class _ReceptionistMembersTabState extends State<ReceptionistMembersTab> {
 
     // Members list
     return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
       itemCount: viewModel.members.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
@@ -314,6 +316,7 @@ class _MemberListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
+      useBlur: false,
       padding: EdgeInsets.zero,
       borderRadius: 20,
       child: Material(

@@ -83,9 +83,23 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
-          child: Column(
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          backgroundColor: AppColors.darkSurface,
+          onRefresh: () async {
+            final authVm = AuthProvider.of(context);
+            final trainerId = authVm.userProfile?.uid;
+            await Future.wait([
+              context.read<AnnouncementViewModel>().loadAnnouncement(),
+              context.read<DashboardStatsViewModel>().loadStats(),
+              if (trainerId != null)
+                context.read<DietPlanViewModel>().loadPlansByTrainer(trainerId),
+            ]);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Greeting ──
@@ -146,64 +160,59 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
               ),
               const SizedBox(height: 12),
 
-              InkWell(
+              GlassCard(
+                useBlur: false,
+                padding: const EdgeInsets.all(20),
+                borderRadius: 20,
                 onTap: () => widget.onWriteDietTap?.call(),
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.dark,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Icon(
-                          Icons.restaurant_menu,
-                          size: 24,
-                          color: AppColors.primary,
-                        ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Write Diet Plan',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
+                      child: const Icon(
+                        Icons.restaurant_menu,
+                        size: 24,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Write Diet Plan',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Create or update a member\'s plan',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white.withValues(alpha: 0.7),
-                              ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Create or update a member\'s plan',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: Colors.white.withValues(alpha: 0.7),
-                      ),
-                    ],
-                  ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
+                  ],
                 ),
               ),
 
@@ -271,6 +280,7 @@ class _TrainerHomeTabState extends State<TrainerHomeTab> {
                 ),
             ],
           ),
+        ),
         ),
       ),
     );

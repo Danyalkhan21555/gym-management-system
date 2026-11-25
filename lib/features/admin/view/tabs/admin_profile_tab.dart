@@ -72,6 +72,7 @@ class AdminProfileTab extends StatelessWidget {
 
               // ── Account Info Card ──
               GlassCard(
+                useBlur: false,
                 padding: const EdgeInsets.all(20),
                 borderRadius: 20,
                 child: Column(
@@ -81,6 +82,10 @@ class AdminProfileTab extends StatelessWidget {
                       'Profile ID',
                       profileId.isEmpty ? '—' : profileId,
                     ),
+                    _buildDivider(),
+                    _buildInfoRow('Email', viewModel.currentUser?.email ?? 'N/A'),
+                    _buildDivider(),
+                    _buildInfoRow('Password', '••••••••'),
                     _buildDivider(),
                     _buildInfoRow('Role', _roleLabel(role)),
                     _buildDivider(),
@@ -96,6 +101,7 @@ class AdminProfileTab extends StatelessWidget {
 
               // ── App Info Card ──
               GlassCard(
+                useBlur: false,
                 padding: const EdgeInsets.all(20),
                 borderRadius: 20,
                 child: Column(
@@ -110,6 +116,7 @@ class AdminProfileTab extends StatelessWidget {
 
               const SizedBox(height: 16),
               GlassCard(
+                useBlur: false,
                 padding: const EdgeInsets.all(20),
                 borderRadius: 20,
                 onTap: () {
@@ -239,13 +246,16 @@ class AdminProfileTab extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
         ),
       ],

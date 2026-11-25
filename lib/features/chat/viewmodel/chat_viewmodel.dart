@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
+import '../model/conversation_model.dart';
 import '../model/message_model.dart';
 import '../repository/chat_repository.dart';
 
@@ -14,6 +15,9 @@ class ChatViewModel extends ChangeNotifier {
   String? _errorMessage;
   StreamSubscription<List<MessageModel>>? _messagesSubscription;
 
+  // Track last read timestamps per room
+  final Map<String, DateTime> _lastReadTimestamps = {};
+
   ChatViewModel(this._repository);
 
   // ── Getters ─────────────────────────────────────────────────────────────────
@@ -24,10 +28,33 @@ class ChatViewModel extends ChangeNotifier {
   bool get isClearing => _isClearing;
   String? get errorMessage => _errorMessage;
 
+  // ── Unread message helpers ──────────────────────────────────────────────────
+
+  /// Marks a conversation room as read up to the current moment.
+  void markRoomAsRead(String roomId) {
+    _lastReadTimestamps[roomId] = DateTime.now();
+    notifyListeners();
+  }
+
+  /// Checks if a conversation has unread messages for the given [currentUserId].
+  bool isRoomUnread(ConversationModel? conv, String currentUserId) {
+    if (conv == null) return false;
+    if (conv.lastMessage.isEmpty || conv.lastMessageSenderId.isEmpty) return false;
+    // Messages sent by the current user are not unread for them
+    if (conv.lastMessageSenderId == currentUserId) return false;
+
+    final lastRead = _lastReadTimestamps[conv.roomId];
+    if (lastRead != null && conv.lastMessageAt != null) {
+      return conv.lastMessageAt!.isAfter(lastRead);
+    }
+    return true;
+  }
+
   // ── Methods ──────────────────────────────────────────────────────────────────
 
   /// Starts listening to real-time messages for the given conversation room.
   void startWatchingMessages(String roomId) {
+    _lastReadTimestamps[roomId] = DateTime.now();
     _messagesSubscription?.cancel();
 
     _isLoadingMessages = true;

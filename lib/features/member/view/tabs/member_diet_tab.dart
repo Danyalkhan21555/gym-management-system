@@ -100,15 +100,22 @@ class _MemberDietTabState extends State<MemberDietTab> {
 
             // ── Body ──
             Expanded(
-              child: !_loaded || planVm.isLoading
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    )
-                  : plan == null
-                  ? _buildEmpty(context, planVm)
-                  : _buildPlanView(context, plan),
+              child: RefreshIndicator(
+                color: AppColors.primary,
+                backgroundColor: AppColors.darkSurface,
+                onRefresh: () async {
+                  await _loadPlan();
+                },
+                child: !_loaded || planVm.isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : plan == null
+                        ? _buildEmpty(context, planVm)
+                        : _buildPlanView(context, plan),
+              ),
             ),
           ],
         ),
@@ -122,6 +129,7 @@ class _MemberDietTabState extends State<MemberDietTab> {
     DietPlanViewModel planVm,
   ) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(24),
       child: GlassCard(
         padding: const EdgeInsets.all(32),
@@ -197,6 +205,7 @@ class _MemberDietTabState extends State<MemberDietTab> {
   // ── Plan View ──
   Widget _buildPlanView(BuildContext context, DietPlanModel plan) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

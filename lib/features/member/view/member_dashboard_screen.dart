@@ -120,11 +120,16 @@ class _MemberDashboardContentState extends State<_MemberDashboardContent> {
         backgroundColor: Colors.transparent,
         body: IndexedStack(
           index: widget.selectedIndex,
-          children: const [
-            RepaintBoundary(child: MemberHomeTab()),
-            RepaintBoundary(child: MemberDietTab()),
-            RepaintBoundary(child: MemberChatTab()),
-            RepaintBoundary(child: MemberProfileTab()),
+          children: [
+            RepaintBoundary(
+              child: MemberHomeTab(
+                onDietTap: () => widget.onTabTapped(1),
+                onChatTap: () => widget.onTabTapped(2),
+              ),
+            ),
+            const RepaintBoundary(child: MemberDietTab()),
+            const RepaintBoundary(child: MemberChatTab()),
+            const RepaintBoundary(child: MemberProfileTab()),
           ],
         ),
         bottomNavigationBar: GlassBottomNav(

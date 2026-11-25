@@ -71,6 +71,7 @@ class TrainerProfileTab extends StatelessWidget {
 
               // ── Account Info Card ──
               GlassCard(
+                useBlur: false,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -78,6 +79,10 @@ class TrainerProfileTab extends StatelessWidget {
                       'Profile ID',
                       profileId.isEmpty ? '—' : profileId,
                     ),
+                    _buildDivider(),
+                    _buildInfoRow('Email', viewModel.currentUser?.email ?? 'N/A'),
+                    _buildDivider(),
+                    _buildInfoRow('Password', '••••••••'),
                     _buildDivider(),
                     _buildInfoRow('Role', _roleLabel(role)),
                     _buildDivider(),
@@ -93,6 +98,7 @@ class TrainerProfileTab extends StatelessWidget {
 
               // ── App Info Card ──
               GlassCard(
+                useBlur: false,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -107,6 +113,7 @@ class TrainerProfileTab extends StatelessWidget {
 
               // ── Change Password Card ──
               GlassCard(
+                useBlur: false,
                 padding: EdgeInsets.zero,
                 onTap: () {
                   Navigator.push(
@@ -238,13 +245,16 @@ class TrainerProfileTab extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
         ),
       ],

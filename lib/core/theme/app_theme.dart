@@ -110,18 +110,18 @@ class AppTheme {
         ),
         labelStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.textSecondary,
+          color: Colors.white70,
           fontSize: 14,
         ),
         floatingLabelStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.dark,
+          color: AppColors.primary,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
         hintStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.textSecondary,
+          color: Colors.white30,
           fontSize: 14,
         ),
         errorStyle: const TextStyle(
@@ -133,9 +133,31 @@ class AppTheme {
 
       // ── Text Selection Theme (for cursor & selection color) ──
       textSelectionTheme: const TextSelectionThemeData(
-        cursorColor: AppColors.dark,
-        selectionColor: AppColors.primary,
-        selectionHandleColor: AppColors.dark,
+        cursorColor: AppColors.primary, // Lime green
+        selectionColor: Colors.white24,
+        selectionHandleColor: AppColors.primary,
+      ),
+
+      // ── Global Dialog Theme ──
+      dialogTheme: DialogThemeData(
+        backgroundColor: const Color(0xFF1E281E),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.12),
+          ),
+        ),
+        titleTextStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+        contentTextStyle: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 14,
+          color: Colors.white.withValues(alpha: 0.7),
+        ),
       ),
     );
   }
@@ -179,6 +201,11 @@ class AppTheme {
           ),
         ),
       ),
+      textSelectionTheme: const TextSelectionThemeData(
+        cursorColor: AppColors.primary, // Lime green
+        selectionColor: Colors.white24,
+        selectionHandleColor: AppColors.primary,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.darkSurface,
@@ -196,11 +223,15 @@ class AppTheme {
         ),
         labelStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.darkTextSecondary,
+          color: Colors.white70,
+        ),
+        floatingLabelStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          color: AppColors.primary,
         ),
         hintStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.darkTextSecondary,
+          color: Colors.white30,
         ),
       ),
     );

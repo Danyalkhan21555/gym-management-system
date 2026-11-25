@@ -117,6 +117,7 @@ class _AdminMembersTabState extends State<AdminMembersTab> {
                   await context.read<MemberViewModel>().loadMembers();
                 },
                 color: AppColors.primary,
+                backgroundColor: AppColors.darkSurface,
                 child: _buildList(context, viewModel),
               ),
             ),
@@ -234,6 +235,7 @@ class _AdminMembersTabState extends State<AdminMembersTab> {
 
     // Members list
     return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
       itemCount: viewModel.members.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
@@ -278,6 +280,7 @@ class _MemberListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassCard(
+      useBlur: false,
       padding: EdgeInsets.zero,
       borderRadius: 20,
       child: Material(

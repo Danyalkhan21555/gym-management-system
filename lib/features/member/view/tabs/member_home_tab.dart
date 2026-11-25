@@ -9,7 +9,14 @@ import '../../../announcements/viewmodel/announcement_viewmodel.dart';
 import '../../../member/model/member_model.dart';
 import '../../viewModel/view_model.dart';
 class MemberHomeTab extends StatefulWidget {
-  const MemberHomeTab({super.key});
+  final VoidCallback? onDietTap;
+  final VoidCallback? onChatTap;
+
+  const MemberHomeTab({
+    super.key,
+    this.onDietTap,
+    this.onChatTap,
+  });
 
   @override
   State<MemberHomeTab> createState() => _MemberHomeTabState();
@@ -132,9 +139,20 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
-          child: Column(
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          backgroundColor: AppColors.darkSurface,
+          onRefresh: () async {
+            final uid = AuthProvider.of(context).userProfile?.uid;
+            await Future.wait([
+              context.read<AnnouncementViewModel>().loadAnnouncement(),
+              if (uid != null) context.read<MemberViewModel>().loadMember(uid),
+            ]);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 100),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Greeting ──
@@ -182,9 +200,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                   Expanded(
                     child: GlassCard(
                       padding: const EdgeInsets.all(16),
-                      onTap: () {
-                        // TODO: navigate to Diet tab
-                      },
+                      onTap: widget.onDietTap,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -228,9 +244,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
                   Expanded(
                     child: GlassCard(
                       padding: const EdgeInsets.all(16),
-                      onTap: () {
-                        // TODO: navigate to Chat tab
-                      },
+                      onTap: widget.onChatTap,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -341,6 +355,7 @@ class _MemberHomeTabState extends State<MemberHomeTab> {
               const SizedBox(height: 16),
             ],
           ),
+        ),
         ),
       ),
     );
